@@ -55,6 +55,15 @@
 			<groupId>org.dkpro.tc</groupId>
 			<artifactId>dkpro-tc-ml-libsvm</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.dkpro.tc</groupId>
+			<artifactId>dkpro-tc-ml-crfsuite</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
