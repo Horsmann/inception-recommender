@@ -3,8 +3,10 @@ package de.unidue.ltl.recommender.core.train;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +45,11 @@ public class TrainModelTest
                 parse.getAsJsonObject().get("target").toString().getBytes());
         annotationFieldName = annotationFieldName.substring(1, annotationFieldName.length()-1);
 
+    }
+    
+    @After
+    public void cleanUp() throws IOException {
+        FileUtils.deleteDirectory(modelLocation);
     }
 
     @Test
