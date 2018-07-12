@@ -37,7 +37,9 @@ public class TrainRequestController
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<String>(
+                "No errors occured - model located at [" + modelLocation.getAbsolutePath() + "]",
+                HttpStatus.OK);
     }
 
     private void trainModel(String cas, String typesystem, String layer, String target,
