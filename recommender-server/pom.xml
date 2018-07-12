@@ -5,12 +5,12 @@
 	<groupId>de.unidue.ltl</groupId>
 	<artifactId>recommender-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-<!-- 	<parent> -->
-<!-- 		<groupId>org.springframework.boot</groupId> -->
-<!-- 		<artifactId>spring-boot-starter-parent</artifactId> -->
-<!-- 		<version>1.5.14.RELEASE</version> -->
-<!-- 		<relativePath /> lookup parent from repository -->
-<!-- 	</parent> -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.14.RELEASE</version>
+		<relativePath /> 
+	</parent>
 
 	<dependencies>
 		<dependency>
