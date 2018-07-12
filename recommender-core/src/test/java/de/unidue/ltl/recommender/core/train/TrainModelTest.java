@@ -25,7 +25,7 @@ public class TrainModelTest
     @Before
     public void setup() throws Exception
     {
-        String json = FileUtils.readFileToString(new File("src/test/resources/jsonRequest.txt"),
+        String json = FileUtils.readFileToString(new File("src/test/resources/jsonTrainRequest.txt"),
                 "utf-8");
 
         JsonElement parse = new JsonParser().parse(json);

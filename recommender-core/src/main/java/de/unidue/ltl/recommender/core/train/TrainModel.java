@@ -106,7 +106,8 @@ public class TrainModel
                 BinaryCasReader.PARAM_PATTERNS, "*.bin");
 
         ExperimentBuilder builder = new ExperimentBuilder();
-        builder.experiment(ExperimentType.SAVE_MODEL, "Inception").dataReaderTrain(trainReader)
+        builder.experiment(ExperimentType.SAVE_MODEL, "Inception")
+                .dataReaderTrain(trainReader)
                 .featureMode(FeatureMode.UNIT).learningMode(LearningMode.SINGLE_LABEL)
                 .outputFolder(model.getAbsolutePath())
                 .machineLearningBackend(new MLBackend(new CrfSuiteAdapter(),
