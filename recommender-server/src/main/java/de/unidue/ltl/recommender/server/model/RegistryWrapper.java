@@ -1,0 +1,41 @@
+package de.unidue.ltl.recommender.server.model;
+
+import java.io.File;
+
+import de.unidue.ltl.register.Register;
+import de.unidue.ltl.register.RegisterEntry;
+
+public class RegistryWrapper implements ModelRepository
+{
+    Register register;
+    
+    public RegistryWrapper(File repositoryRoot) {
+        register = new Register(repositoryRoot);
+    }
+
+    @Override
+    public Model getModel(String id)
+    {
+        RegisterEntry entry = register.getEntry(id);
+        
+        return new ModelWrapper(entry.getId(), entry.getTimeStamp(), entry.getModelLocation());
+    }
+
+    @Override
+    public void addModel(Model m) throws Exception
+    {
+        if(exists(m.getId())) {
+            register.registerEntry(m.getFileSystemLocation(), m.getId(), m.getTimestamp());
+            return;
+        }
+        
+        RegisterEntry entry = new RegisterEntry(m.getId(), m.getTimestamp(), m.getFileSystemLocation());
+        register.addNewEntry(entry);
+    }
+    
+    private boolean exists(String id)
+    {
+        return register.getEntryIds().contains(id);
+    }
+
+}
