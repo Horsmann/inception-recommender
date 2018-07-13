@@ -1,4 +1,4 @@
-package de.unidue.ltl.modelstorage;
+package de.unidue.ltl.register;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,7 +12,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ModelStorageDeSerializationTest
+import de.unidue.ltl.register.Register;
+import de.unidue.ltl.register.RegisterJsonDeSerializer;
+
+public class RegisterDeSerializationTest
 {
     @Rule
     public TemporaryFolder root = new TemporaryFolder();
@@ -20,7 +23,7 @@ public class ModelStorageDeSerializationTest
     public TemporaryFolder modelDummyTwo = new TemporaryFolder();
     File serializedFile; 
             
-    ModelStorage storage;
+    Register storage;
 
     @Before
     public void setup() throws IOException
@@ -29,14 +32,14 @@ public class ModelStorageDeSerializationTest
         modelDummyOne.create();
         modelDummyTwo.create();
 
-        storage = new ModelStorage(root.getRoot());
+        storage = new Register(root.getRoot());
     }
 
     @Test
     public void deSerialization() throws IOException, InterruptedException
     {
         serializedFile = File.createTempFile("serializedStorage", ".json");
-        ModelStorage storage = new ModelStorage(root.getRoot());
+        Register storage = new Register(root.getRoot());
         storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123);
         storage.addModelToStore(modelDummyTwo.getRoot(), "DFS-ABC", 324123);
         storage.dumpStorageToJson(serializedFile);
@@ -44,7 +47,7 @@ public class ModelStorageDeSerializationTest
         String json = FileUtils.readFileToString(serializedFile, "utf-8");
         assertTrue(!json.isEmpty());
 
-        ModelStorage deserialize = ModelStorageJsonDeSerializer.deserialize(serializedFile);
+        Register deserialize = RegisterJsonDeSerializer.deserialize(serializedFile);
         assertEquals(storage.getModelIds().size(), deserialize.getModelIds().size());
         
         for(String key : deserialize.getModelIds()) {

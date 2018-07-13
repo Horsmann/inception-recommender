@@ -1,8 +1,8 @@
-package de.unidue.ltl.modelstorage;
+package de.unidue.ltl.register;
 
 import java.io.File;
 
-public class ModelUtil
+public class RegisterUtil
 {
     public static  void nullCheck(Object o)
     {

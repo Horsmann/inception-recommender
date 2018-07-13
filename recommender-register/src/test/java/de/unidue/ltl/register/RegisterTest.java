@@ -1,4 +1,4 @@
-package de.unidue.ltl.modelstorage;
+package de.unidue.ltl.register;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,14 +12,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ModelStorageTest
+import de.unidue.ltl.register.RegisterEntry;
+import de.unidue.ltl.register.Register;
+
+public class RegisterTest
 {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     public TemporaryFolder modelDummyOne = new TemporaryFolder();
     public TemporaryFolder modelDummyTwo = new TemporaryFolder();
 
-    ModelStorage storage;
+    Register storage;
 
     @Before
     public void setup() throws IOException
@@ -28,7 +31,7 @@ public class ModelStorageTest
         modelDummyOne.create();
         modelDummyTwo.create();
 
-        storage = new ModelStorage(folder.getRoot());
+        storage = new Register(folder.getRoot());
     }
 
     @Test
@@ -38,7 +41,7 @@ public class ModelStorageTest
         List<String> modelIds = storage.getModelIds();
         assertEquals(1, modelIds.size());
 
-        Model m = storage.getModel("ABC");
+        RegisterEntry m = storage.getModel("ABC");
         assertEquals("ABC", m.getId());
         assertEquals(123456, m.getTimeStamp());
     }
@@ -47,7 +50,7 @@ public class ModelStorageTest
     public void storageOverrideModelEntryTest() throws IOException, InterruptedException
     {
         storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        Model m = storage.getModel("ABC");
+        RegisterEntry m = storage.getModel("ABC");
         File modelOneLoc = m.getModelLocation();
         storage.addModelToStore(modelDummyTwo.getRoot(), "ABC", 3333);
         File modelTwoLoc = m.getModelLocation();
@@ -61,7 +64,7 @@ public class ModelStorageTest
     {
 
         storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        Model model = storage.getModel("ABC");
+        RegisterEntry model = storage.getModel("ABC");
 
         assertEquals(0, model.getNumberOfModelAccesses().intValue());
         model.beginReadAccess();
@@ -78,7 +81,7 @@ public class ModelStorageTest
     {
 
         storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        Model model = storage.getModel("ABC");
+        RegisterEntry model = storage.getModel("ABC");
         File modelLocationBefore = model.getModelLocation();
         model.beginReadAccess();
 
@@ -92,7 +95,7 @@ public class ModelStorageTest
 
     }
     
-    private void startLockReleasingThread(Model model) throws InterruptedException
+    private void startLockReleasingThread(RegisterEntry model) throws InterruptedException
     {
         Runnable r = new Runnable()
         {

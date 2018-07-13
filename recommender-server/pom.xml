@@ -14,6 +14,11 @@
 			<artifactId>recommender-core</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>de.unidue.ltl</groupId>
+			<artifactId>recommender-register</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>recommender-server</finalName>

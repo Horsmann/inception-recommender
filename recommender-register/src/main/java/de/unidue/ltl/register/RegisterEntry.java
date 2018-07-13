@@ -1,4 +1,4 @@
-package de.unidue.ltl.modelstorage;
+package de.unidue.ltl.register;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Model
+public class RegisterEntry
 {
-    static final Logger logger = LoggerFactory.getLogger(Model.class.getName());
+    static final Logger logger = LoggerFactory.getLogger(RegisterEntry.class.getName());
 
     private long timestamp;
     private AtomicInteger modelAccesses = new AtomicInteger(0);
@@ -18,7 +18,7 @@ public class Model
     private String id;
     private File inStorageLocation;
 
-    public Model(String id, long timestamp, File inStorageLocation)
+    public RegisterEntry(String id, long timestamp, File inStorageLocation)
     {
         this.id = id;
         this.timestamp = timestamp;
@@ -28,7 +28,7 @@ public class Model
     public synchronized void setModel(File newModel, long timestamp)
         throws InterruptedException, IOException
     {
-        ModelUtil.nullCheck(newModel);
+        RegisterUtil.nullCheck(newModel);
 
         logger.debug("Update on model with id [" + this.id + "] current read accesses ["
                 + modelAccesses.get() + "]");
