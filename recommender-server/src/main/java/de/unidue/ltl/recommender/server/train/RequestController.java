@@ -16,14 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import de.unidue.ltl.recommender.server.InceptionRequest;
 import de.unidue.ltl.recommender.server.model.Model;
 import de.unidue.ltl.recommender.server.model.ModelRepository;
-import de.unidue.ltl.recommender.server.model.RegistryWrapper;
 
 @RestController
 public class RequestController
 {
-    
-//    @Autowired
-//    ModelRepository repository; 
+
+    @Autowired
+    ModelRepository repository;
 
     @RequestMapping(value = "/train", method = RequestMethod.POST)
     public ResponseEntity<String> executeTraining(@RequestBody InceptionRequest inceptionReq)
@@ -33,6 +32,7 @@ public class RequestController
         Trainer t = new InceptionTrainer();
         try {
             trainedModel = t.train(inceptionReq);
+            repository.addModel(trainedModel);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

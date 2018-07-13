@@ -1,4 +1,4 @@
-package de.unidue.ltl.register;
+package de.unidue.ltl.recommender.register;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class Register
 {
-    static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
     File storeRootDirectory;
     Map<String, RegisterEntry> registerMap = new HashMap<>();
 
@@ -23,9 +23,8 @@ public class Register
         this.storeRootDirectory = storeRootDirectory;
         RegisterUtil.nullCheck(this.storeRootDirectory);
         RegisterUtil.createFileSystemLocation(this.storeRootDirectory);
-        logger.info(
-                "Create [" + Register.class.getSimpleName() + "] with root folder located at ["
-                        + this.storeRootDirectory.getAbsolutePath() + "]");
+        logger.info("Create [" + Register.class.getSimpleName() + "] with root folder located at ["
+                + this.storeRootDirectory.getAbsolutePath() + "]");
     }
 
     public void registerEntry(File sourceLocation, String modelId, long timestamp)
@@ -50,7 +49,7 @@ public class Register
 
         ensureStorageLocationDoesNotExist(inStorageLocation);
         FileUtils.moveDirectory(sourceLocation, inStorageLocation);
-        model.setModel(inStorageLocation, timestamp);
+        model.updateModel(inStorageLocation, timestamp);
 
     }
 
@@ -90,6 +89,8 @@ public class Register
 
     public void addNewEntry(RegisterEntry entry)
     {
+        logger.info("Register new entry with id/timestemps [" + entry.getId() + "/"
+                + entry.getTimeStamp() + "]");
         RegisterEntry e = registerMap.get(entry.getId());
         if (!RegisterUtil.isNull(e)) {
             throw new IllegalStateException(

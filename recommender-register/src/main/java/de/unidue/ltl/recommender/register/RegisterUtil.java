@@ -1,4 +1,4 @@
-package de.unidue.ltl.register;
+package de.unidue.ltl.recommender.register;
 
 import java.io.File;
 

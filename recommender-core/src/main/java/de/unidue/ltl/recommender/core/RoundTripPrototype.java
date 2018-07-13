@@ -32,7 +32,7 @@ import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.tudarmstadt.ukp.dkpro.core.io.bincas.BinaryCasReader;
 import de.unidue.ltl.recommender.core.predict.PredictionAnnotator;
 import de.unidue.ltl.recommender.core.train.TrainingOutcomeAnnotator;
-import de.unidue.ltl.recommender.core.util.RecommenderUtil;
+import de.unidue.ltl.recommender.core.util.CoreUtil;
 
 public class RoundTripPrototype
 {
@@ -58,22 +58,22 @@ public class RoundTripPrototype
         annotation = annotation.substring(1, annotation.length()-1);
         
         String trainCasString = FileUtils.readFileToString(new File("src/main/resources/casAnnotated.txt"), "utf-8");
-        JCas jCasTrain = RecommenderUtil.deserialize(trainCasString, typesystemXML);
+        JCas jCasTrain = CoreUtil.deserialize(trainCasString, typesystemXML);
         
         TypeSystemDescription typeSystemDesc = TypeSystemUtil.typeSystem2TypeSystemDescription(jCasTrain.getTypeSystem());
         
         File casTrainOutput = new File("src/main/resources/cas/train/");
-        RecommenderUtil.writeCasBinary(jCasTrain, typeSystemDesc, casTrainOutput);
+        CoreUtil.writeCasBinary(jCasTrain, typeSystemDesc, casTrainOutput);
         
         File model = new File(System.getProperty("user.home")  + "/Desktop/inception-model");
         trainModel(casTrainOutput, typeSystemDesc, model, typesystemXML, annotation, featureType);
         
         String casString = new String(Base64.decodeBase64(parse.getAsJsonObject().get("CAS").toString().getBytes()));
-        JCas jCasPrediction= RecommenderUtil.deserialize(casString, typesystemXML);
+        JCas jCasPrediction= CoreUtil.deserialize(casString, typesystemXML);
         
         File casPredictOutput = new File("src/main/resources/cas/predict/");
         
-        RecommenderUtil.writeCasBinary(jCasPrediction, typeSystemDesc, casPredictOutput);
+        CoreUtil.writeCasBinary(jCasPrediction, typeSystemDesc, casPredictOutput);
         predict(casPredictOutput, model, annotation, featureType);
 
         

@@ -1,4 +1,4 @@
-package de.unidue.ltl.register;
+package de.unidue.ltl.recommender.register;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,8 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.unidue.ltl.register.RegisterEntry;
-import de.unidue.ltl.register.Register;
+import de.unidue.ltl.recommender.register.Register;
+import de.unidue.ltl.recommender.register.RegisterEntry;
 
 public class RegisterTest
 {

@@ -1,4 +1,4 @@
-package de.unidue.ltl.register;
+package de.unidue.ltl.recommender.register;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class RegisterEntry
         this.inStorageLocation = inStorageLocation;
     }
 
-    public synchronized void setModel(File newModel, long timestamp)
+    public synchronized void updateModel(File newModel, long timestamp)
         throws InterruptedException, IOException
     {
         RegisterUtil.nullCheck(newModel);

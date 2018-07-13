@@ -21,7 +21,7 @@ import org.dkpro.tc.api.type.TextClassificationOutcome;
 
 import de.tudarmstadt.ukp.dkpro.core.api.featurepath.FeaturePathUtils;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
-import de.unidue.ltl.recommender.core.util.RecommenderUtil;
+import de.unidue.ltl.recommender.core.util.CoreUtil;
 
 public class PredictionAnnotator
     extends JCasAnnotator_ImplBase
@@ -103,7 +103,7 @@ public class PredictionAnnotator
 
     private void serializeCas(JCas aJCas, int c) throws Exception
     {
-        RecommenderUtil.serialize(aJCas, new File(outputFolder, "cas_" + c + ".txt"));
+        CoreUtil.serialize(aJCas, new File(outputFolder, "cas_" + c + ".txt"));
     }
 
     @Override

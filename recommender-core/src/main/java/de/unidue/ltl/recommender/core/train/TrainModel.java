@@ -25,7 +25,7 @@ import org.dkpro.tc.ml.crfsuite.CrfSuiteAdapter;
 import com.google.common.io.Files;
 
 import de.tudarmstadt.ukp.dkpro.core.io.bincas.BinaryCasReader;
-import de.unidue.ltl.recommender.core.util.RecommenderUtil;
+import de.unidue.ltl.recommender.core.util.CoreUtil;
 
 public class TrainModel
 {
@@ -66,11 +66,11 @@ public class TrainModel
         throws Exception
     {
         writeTypeSystemToFile(decodeBase64(typeSystemBase64));
-        JCas jCas = RecommenderUtil.deserialize(decodeBase64(casBase64), typeSystemXML);
+        JCas jCas = CoreUtil.deserialize(decodeBase64(casBase64), typeSystemXML);
 
         TypeSystemDescription typeSystemDesc = TypeSystemUtil
                 .typeSystem2TypeSystemDescription(jCas.getTypeSystem());
-        RecommenderUtil.writeCasBinary(jCas, typeSystemDesc, binCasInputFolder);
+        CoreUtil.writeCasBinary(jCas, typeSystemDesc, binCasInputFolder);
 
         return typeSystemDesc;
     }

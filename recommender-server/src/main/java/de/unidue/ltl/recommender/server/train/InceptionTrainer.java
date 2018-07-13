@@ -9,7 +9,8 @@ import de.unidue.ltl.recommender.server.InceptionRequest;
 import de.unidue.ltl.recommender.server.model.Model;
 import de.unidue.ltl.recommender.server.model.ModelWrapper;
 
-public class InceptionTrainer implements Trainer
+public class InceptionTrainer
+    implements Trainer
 {
 
     @Override
@@ -19,12 +20,14 @@ public class InceptionTrainer implements Trainer
         String typesystem = req.getTypesystem();
         String layer = req.getLayer();
         String target = req.getTarget();
-        File modelLocation = new File(FileUtils.getTempDirectory(), "tc-model" + layer);
+
+        long timestamps = System.currentTimeMillis();
+        File modelLocation = new File(FileUtils.getTempDirectory(), layer + "_" + timestamps);
 
         TrainModel model = new TrainModel();
         model.run(cas, typesystem, layer, target, modelLocation);
-        
-        return new ModelWrapper("ABC", System.currentTimeMillis(), modelLocation);
+
+        return new ModelWrapper(layer, timestamps, modelLocation);
     }
 
 }

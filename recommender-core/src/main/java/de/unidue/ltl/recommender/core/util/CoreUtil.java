@@ -17,7 +17,7 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 
 import de.tudarmstadt.ukp.dkpro.core.io.bincas.BinaryCasWriter;
 
-public class RecommenderUtil
+public class CoreUtil
 {
     
     public static void serialize(JCas jCas, File name) throws Exception  {
