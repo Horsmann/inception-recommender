@@ -22,8 +22,8 @@ import de.unidue.ltl.recommender.server.model.RegistryWrapper;
 public class RequestController
 {
     
-    @Autowired
-    ModelRepository repository; 
+//    @Autowired
+//    ModelRepository repository; 
 
     @RequestMapping(value = "/train", method = RequestMethod.POST)
     public ResponseEntity<String> executeTraining(@RequestBody InceptionRequest inceptionReq)

@@ -1,24 +1,19 @@
 package de.unidue.ltl.recommender.server.model;
 
-import java.io.File;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import de.unidue.ltl.register.Register;
 import de.unidue.ltl.register.RegisterEntry;
 
-@Component
+//@Component
 public class RegistryWrapper implements ModelRepository
 {
     Register register;
     
-    @Value("${repositoryRoot}")
-    File repositoryRoot;
+//    @Value("${repositoryRoot}")
+//    File repositoryRoot;
     
-    public RegistryWrapper() {
-        register = new Register(repositoryRoot);
-    }
+//    public RegistryWrapper() {
+//        register = new Register(repositoryRoot);
+//    }
 
     @Override
     public Model getModel(String id)

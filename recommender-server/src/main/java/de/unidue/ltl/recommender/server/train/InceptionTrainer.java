@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import de.unidue.ltl.recommender.core.train.TrainModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
 import de.unidue.ltl.recommender.server.model.Model;
+import de.unidue.ltl.recommender.server.model.ModelWrapper;
 
 public class InceptionTrainer implements Trainer
 {
@@ -23,7 +24,7 @@ public class InceptionTrainer implements Trainer
         TrainModel model = new TrainModel();
         model.run(cas, typesystem, layer, target, modelLocation);
         
-        return null;
+        return new ModelWrapper("ABC", System.currentTimeMillis(), modelLocation);
     }
 
 }
