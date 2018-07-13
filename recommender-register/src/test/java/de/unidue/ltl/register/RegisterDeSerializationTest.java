@@ -40,18 +40,18 @@ public class RegisterDeSerializationTest
     {
         serializedFile = File.createTempFile("serializedStorage", ".json");
         Register storage = new Register(root.getRoot());
-        storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123);
-        storage.addModelToStore(modelDummyTwo.getRoot(), "DFS-ABC", 324123);
+        storage.registerEntry(modelDummyOne.getRoot(), "ABC", 123);
+        storage.registerEntry(modelDummyTwo.getRoot(), "DFS-ABC", 324123);
         storage.dumpStorageToJson(serializedFile);
         
         String json = FileUtils.readFileToString(serializedFile, "utf-8");
         assertTrue(!json.isEmpty());
 
         Register deserialize = RegisterJsonDeSerializer.deserialize(serializedFile);
-        assertEquals(storage.getModelIds().size(), deserialize.getModelIds().size());
+        assertEquals(storage.getEntryIds().size(), deserialize.getEntryIds().size());
         
-        for(String key : deserialize.getModelIds()) {
-            assertEquals(storage.getModel(key).toString(), deserialize.getModel(key).toString());
+        for(String key : deserialize.getEntryIds()) {
+            assertEquals(storage.getEntry(key).toString(), deserialize.getEntry(key).toString());
         }
         
         

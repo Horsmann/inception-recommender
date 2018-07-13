@@ -26,7 +26,7 @@ public class RegisterJsonDeSerializer
     public static String createJsonFromStorage(Register modelStorage)
     {
 
-        List<String> keys = new ArrayList<String>(modelStorage.modelMap.keySet());
+        List<String> keys = new ArrayList<String>(modelStorage.registerMap.keySet());
         Collections.sort(keys);
 
         JSONObject dump = new JSONObject();
@@ -34,7 +34,7 @@ public class RegisterJsonDeSerializer
         JSONArray array = new JSONArray();
         for (String k : keys) {
             JSONObject item = new JSONObject();
-            RegisterEntry model = modelStorage.modelMap.get(k);
+            RegisterEntry model = modelStorage.registerMap.get(k);
             item.put(MODEL_ID, model.getId());
             item.put(MODEL_TIMESTAMP, model.getTimeStamp() + "");
             item.put(MODEL_LOCATION, model.getModelLocation().getAbsolutePath());
@@ -71,7 +71,7 @@ public class RegisterJsonDeSerializer
 
             RegisterEntry model = new RegisterEntry(id, ts, location);
 
-            storage.addModel(model);
+            storage.addNewEntry(model);
         }
 
         return storage;

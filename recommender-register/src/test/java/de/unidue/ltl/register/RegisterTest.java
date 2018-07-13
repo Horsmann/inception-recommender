@@ -37,11 +37,11 @@ public class RegisterTest
     @Test
     public void storagePlainEntryTest() throws IOException, InterruptedException
     {
-        storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        List<String> modelIds = storage.getModelIds();
+        storage.registerEntry(modelDummyOne.getRoot(), "ABC", 123456);
+        List<String> modelIds = storage.getEntryIds();
         assertEquals(1, modelIds.size());
 
-        RegisterEntry m = storage.getModel("ABC");
+        RegisterEntry m = storage.getEntry("ABC");
         assertEquals("ABC", m.getId());
         assertEquals(123456, m.getTimeStamp());
     }
@@ -49,10 +49,10 @@ public class RegisterTest
     @Test
     public void storageOverrideModelEntryTest() throws IOException, InterruptedException
     {
-        storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        RegisterEntry m = storage.getModel("ABC");
+        storage.registerEntry(modelDummyOne.getRoot(), "ABC", 123456);
+        RegisterEntry m = storage.getEntry("ABC");
         File modelOneLoc = m.getModelLocation();
-        storage.addModelToStore(modelDummyTwo.getRoot(), "ABC", 3333);
+        storage.registerEntry(modelDummyTwo.getRoot(), "ABC", 3333);
         File modelTwoLoc = m.getModelLocation();
 
         // location should have changed
@@ -63,8 +63,8 @@ public class RegisterTest
     public void modelAccessTest() throws IOException, InterruptedException
     {
 
-        storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        RegisterEntry model = storage.getModel("ABC");
+        storage.registerEntry(modelDummyOne.getRoot(), "ABC", 123456);
+        RegisterEntry model = storage.getEntry("ABC");
 
         assertEquals(0, model.getNumberOfModelAccesses().intValue());
         model.beginReadAccess();
@@ -80,13 +80,13 @@ public class RegisterTest
     public void updateModelWhileBeingAccessed() throws IOException, InterruptedException
     {
 
-        storage.addModelToStore(modelDummyOne.getRoot(), "ABC", 123456);
-        RegisterEntry model = storage.getModel("ABC");
+        storage.registerEntry(modelDummyOne.getRoot(), "ABC", 123456);
+        RegisterEntry model = storage.getEntry("ABC");
         File modelLocationBefore = model.getModelLocation();
         model.beginReadAccess();
 
         startLockReleasingThread(model);
-        storage.addModelToStore(modelDummyTwo.getRoot(), "ABC", 3333);
+        storage.registerEntry(modelDummyTwo.getRoot(), "ABC", 3333);
 
         File modelLocationAfter = model.getModelLocation();
 

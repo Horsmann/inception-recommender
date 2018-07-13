@@ -16,7 +16,7 @@ public class Register
 {
     static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
     File storeRootDirectory;
-    Map<String, RegisterEntry> modelMap = new HashMap<>();
+    Map<String, RegisterEntry> registerMap = new HashMap<>();
 
     public Register(File storeRootDirectory)
     {
@@ -28,20 +28,20 @@ public class Register
                         + this.storeRootDirectory.getAbsolutePath() + "]");
     }
 
-    public void addModelToStore(File sourceLocation, String modelId, long timestamp)
+    public void registerEntry(File sourceLocation, String modelId, long timestamp)
         throws IOException, InterruptedException
     {
         RegisterUtil.nullCheck(sourceLocation);
         RegisterUtil.nullCheck(modelId);
 
-        RegisterEntry model = modelMap.get(modelId);
+        RegisterEntry model = registerMap.get(modelId);
         if (RegisterUtil.isNull(model)) {
             logger.debug("No model with id [" + modelId + "] found - will create a new model");
             File inStorageLocation = getDestinationInStorage(modelId, timestamp);
             FileUtils.moveDirectory(sourceLocation, inStorageLocation);
 
             model = new RegisterEntry(modelId, timestamp, inStorageLocation);
-            modelMap.put(modelId, model);
+            registerMap.put(modelId, model);
             return;
         }
 
@@ -67,35 +67,35 @@ public class Register
         return new File(storeRootDirectory, id + "_" + timeStamp);
     }
 
-    public List<String> getModelIds()
+    public List<String> getEntryIds()
     {
-        return new ArrayList<String>(modelMap.keySet());
+        return new ArrayList<String>(registerMap.keySet());
     }
 
-    public RegisterEntry getModel(String id)
+    public RegisterEntry getEntry(String id)
     {
-        RegisterEntry model = modelMap.get(id);
+        RegisterEntry model = registerMap.get(id);
         return model;
     }
 
-    public void dumpStorageToJson(File serializedModelStorage) throws IOException
+    public void dumpStorageToJson(File serializationTarget) throws IOException
     {
-        RegisterJsonDeSerializer.serialize(this, serializedModelStorage);
+        RegisterJsonDeSerializer.serialize(this, serializationTarget);
     }
 
-    public void loadStorageFromJson(File serializedModelStorage) throws JSONException, IOException
+    public void loadStorageFromJson(File deserializsationSource) throws JSONException, IOException
     {
-        RegisterJsonDeSerializer.deserialize(serializedModelStorage);
+        RegisterJsonDeSerializer.deserialize(deserializsationSource);
     }
 
-    void addModel(RegisterEntry model)
+    public void addNewEntry(RegisterEntry entry)
     {
-        RegisterEntry m = modelMap.get(model.getId());
-        if (!RegisterUtil.isNull(m)) {
+        RegisterEntry e = registerMap.get(entry.getId());
+        if (!RegisterUtil.isNull(e)) {
             throw new IllegalStateException(
-                    "The model with id [" + model.getId() + "] exists already");
+                    "The entry with id [" + entry.getId() + "] exists already");
         }
 
-        modelMap.put(model.getId(), model);
+        registerMap.put(entry.getId(), entry);
     }
 }
