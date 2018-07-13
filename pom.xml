@@ -30,7 +30,7 @@
 	<modules>
 		<!-- Please keep in alphabetical order -->
 		<module>recommender-core</module>
-		<module>recommender-model-storage</module>
+		<module>recommender-register</module>
 		<module>recommender-server</module>
 	</modules>
 	<parent>
@@ -56,7 +56,7 @@
 					<groups>
 						<group>
 							<title>API definitions</title>
-							<packages>org.dkpro.ltl.*</packages>
+							<packages>de.unidue.ltl.*</packages>
 						</group>
 					</groups>
 				</configuration>
