@@ -21,31 +21,38 @@ package de.unidue.ltl.recommender.server.train;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.unidue.ltl.recommender.core.train.TrainModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
-import de.unidue.ltl.recommender.server.model.Model;
-import de.unidue.ltl.recommender.server.model.ModelWrapper;
 
 public class InceptionTrainer
     implements Trainer
 {
 
+    private static final Logger logger = LoggerFactory.getLogger(InceptionTrainer.class.getName());
+
     @Override
-    public Model train(InceptionRequest req) throws Exception
+    public InceptionModel train(InceptionRequest req) throws Exception
     {
         String cas = req.getCAS();
         String typesystem = req.getTypesystem();
-        String layer = req.getLayer();
+        String id = req.getLayer();
         String target = req.getTarget();
 
         long timestamps = System.currentTimeMillis();
-        File modelLocation = new File(FileUtils.getTempDirectory(), layer + "_" + timestamps);
+        File modelLocation = new File(FileUtils.getTempDirectory(), id);
+
+        logger.info("Will store model temporary at [" + modelLocation.getAbsolutePath() + "]");
 
         TrainModel model = new TrainModel();
-        model.run(cas, typesystem, layer, target, modelLocation);
+        model.run(cas, typesystem, id, target, modelLocation);
 
-        return new ModelWrapper(layer, timestamps, modelLocation);
+        logger.info("Will create model with id [" + id + "] at location ["
+                + modelLocation.getAbsolutePath() + "]");
+
+        return new Model(id, timestamps, modelLocation);
     }
 
 }

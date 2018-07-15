@@ -26,13 +26,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.unidue.ltl.recommender.register.Register;
-import de.unidue.ltl.recommender.register.RegisterEntry;
+import de.unidue.ltl.recommender.register.Entry;
+import de.unidue.ltl.recommender.server.train.InceptionModel;
+import de.unidue.ltl.recommender.server.train.Model;
 
 @Component
-public class RegistryWrapper
+public class RepositoryImpl
     implements ModelRepository
 {
-    private static final Logger logger = LoggerFactory.getLogger(RegistryWrapper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class.getName());
 
     Register register;
 
@@ -44,31 +46,32 @@ public class RegistryWrapper
         if (register == null) {
             logger.info("Initializing with root directory located at [" + repositoryRoot + "]");
             register = new Register(repositoryRoot);
+            register.screenFolderAndLoad();
         }
     }
 
     @Override
-    public Model getModel(String id)
+    public InceptionModel getModel(String id)
     {
         init();
-        RegisterEntry entry = register.getEntry(id);
+        Entry entry = register.getEntry(id);
 
-        return new ModelWrapper(entry.getId(), entry.getTimeStamp(), entry.getModelLocation());
+        return new Model(entry.getId(), entry.getTimeStamp(), entry.getModelLocation());
     }
 
     @Override
-    public void addModel(Model m) throws Exception
+    public void addModel(String id, long timestamp, File sourceLocation) throws Exception
     {
         init();
-        
-        if (exists(m.getId())) {
-            register.registerEntry(m.getFileSystemLocation(), m.getId(), m.getTimestamp());
+
+        if (exists(id)) {
+            logger.info("The model with [" + id + "] already exists - will update existing entry");
+            register.updateEntry(id, timestamp, sourceLocation, true);
             return;
         }
 
-        RegisterEntry entry = new RegisterEntry(m.getId(), m.getTimestamp(),
-                m.getFileSystemLocation());
-        register.addNewEntry(entry);
+        Entry entry = new Entry(repositoryRoot, id, timestamp);
+        register.addEntry(entry, sourceLocation, true);
     }
 
     private boolean exists(String id)

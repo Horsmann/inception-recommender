@@ -16,11 +16,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.model;
+package de.unidue.ltl.recommender.server.train;
 
 import java.io.File;
 
-public interface Model
+public interface InceptionModel
 {
     String getId();
     

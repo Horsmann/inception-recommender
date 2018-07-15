@@ -15,41 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
-package de.unidue.ltl.recommender.server.model;
+package de.unidue.ltl.recommender.register;
 
 import java.io.File;
 
-public class ModelWrapper
-    implements Model
+public class EntryNameGenerator
 {
-    private String id;
-    private long timestamp;
-    private File modelLocation;
-
-    public ModelWrapper(String id, long timestamp, File modelLocation)
-    {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.modelLocation = modelLocation;
-    }
-
-    @Override
-    public String getId()
-    {
-        return id;
-    }
-
-    @Override
-    public long getTimestamp()
-    {
-        return timestamp;
-    }
-
-    @Override
-    public File getFileSystemLocation()
-    {
-        return modelLocation;
+    public static String generateStorageLocation(File root, Entry entry) {
+        
+        return "";
     }
 
 }

@@ -32,13 +32,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.unidue.ltl.recommender.server.InceptionRequest;
-import de.unidue.ltl.recommender.server.model.Model;
 import de.unidue.ltl.recommender.server.model.ModelRepository;
 
 @RestController
 public class RequestController
 {
-
     @Autowired
     ModelRepository repository;
 
@@ -46,11 +44,11 @@ public class RequestController
     public ResponseEntity<String> executeTraining(@RequestBody InceptionRequest inceptionReq)
     {
 
-        Model trainedModel = null;
+        InceptionModel trainedModel = null;
         Trainer t = new InceptionTrainer();
         try {
             trainedModel = t.train(inceptionReq);
-            repository.addModel(trainedModel);
+            repository.addModel(trainedModel.getId(), trainedModel.getTimestamp(), trainedModel.getFileSystemLocation());
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

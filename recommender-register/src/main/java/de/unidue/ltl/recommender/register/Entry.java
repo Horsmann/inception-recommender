@@ -26,38 +26,37 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RegisterEntry
+public class Entry
 {
-    static final Logger logger = LoggerFactory.getLogger(RegisterEntry.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Entry.class.getName());
 
-    private long timestamp;
     private AtomicInteger modelAccesses = new AtomicInteger(0);
     private Semaphore modelUpdateOperation = new Semaphore(1, true);
-    private String id;
-    private File inStorageLocation;
+    long timestamp;
+    String id;
+    File root;
 
-    public RegisterEntry(String id, long timestamp, File inStorageLocation)
+    public Entry(File rootFolder, String modelId, long timestamp)
     {
-        this.id = id;
+        this.root= rootFolder;
+        this.id = modelId;
         this.timestamp = timestamp;
-        this.inStorageLocation = inStorageLocation;
     }
 
-    public synchronized void updateModel(File newModel, long timestamp)
-        throws InterruptedException, IOException
+    public synchronized void updateTimeStamp(long timestamp) throws InterruptedException, IOException
     {
-        RegisterUtil.nullCheck(newModel);
-
         logger.debug("Update on model with id [" + this.id + "] current read accesses ["
                 + modelAccesses.get() + "]");
         modelUpdateOperation.acquire();
 
-        logger.debug("Replacing model [" + inStorageLocation.getAbsolutePath()
-                + "] with new model [" + newModel.getAbsolutePath() + "]");
-        this.inStorageLocation = newModel;
         this.timestamp = timestamp;
 
         modelUpdateOperation.release();
+    }
+
+    File getFileSystemPath()
+    {
+        return new File(root, this.id + "_" + this.timestamp);
     }
 
     public synchronized void beginReadAccess() throws InterruptedException
@@ -98,7 +97,7 @@ public class RegisterEntry
 
     public File getModelLocation()
     {
-        return inStorageLocation;
+        return getFileSystemPath();
     }
 
     Integer getNumberOfModelAccesses()
@@ -108,7 +107,7 @@ public class RegisterEntry
 
     public String toString()
     {
-        return "[" + id + "] / [" + timestamp + "] / ["
-                + inStorageLocation.getAbsolutePath() + "]";
+        return "[" + id + "] / [" + timestamp + "] / [" + getFileSystemPath() + "]";
     }
+
 }

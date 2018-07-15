@@ -22,7 +22,7 @@ import java.io.File;
 
 public class RegisterUtil
 {
-    public static  void nullCheck(Object o)
+    public static void nullCheck(Object o)
     {
         if (isNull(o)) {
             throw new NullPointerException("Variable is null");
@@ -33,7 +33,7 @@ public class RegisterUtil
     {
         return o == null;
     }
-    
+
     public static void createFileSystemLocation(File location)
     {
         if (!location.exists()) {
@@ -44,4 +44,5 @@ public class RegisterUtil
             }
         }
     }
+    
 }

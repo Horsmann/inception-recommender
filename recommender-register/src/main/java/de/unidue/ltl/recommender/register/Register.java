@@ -19,6 +19,7 @@
 package de.unidue.ltl.recommender.register;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,62 +27,65 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Register
 {
     private static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
-    File storeRootDirectory;
-    Map<String, RegisterEntry> registerMap = new HashMap<>();
+    private static final String TIMESTAMP_SEP = "_";
+    File rootFolder;
+    Map<String, Entry> registerMap = new HashMap<>();
 
     public Register(File storeRootDirectory)
     {
-        this.storeRootDirectory = storeRootDirectory;
-        RegisterUtil.nullCheck(this.storeRootDirectory);
-        RegisterUtil.createFileSystemLocation(this.storeRootDirectory);
+        this.rootFolder = storeRootDirectory;
+        RegisterUtil.nullCheck(this.rootFolder);
+        RegisterUtil.createFileSystemLocation(this.rootFolder);
         logger.info("Create [" + Register.class.getSimpleName() + "] with root folder located at ["
-                + this.storeRootDirectory.getAbsolutePath() + "]");
+                + this.rootFolder.getAbsolutePath() + "]");
     }
 
-    public void registerEntry(File sourceLocation, String modelId, long timestamp)
+    public void addEntry(Entry entry, File sourceLocation, boolean deleteSource) throws IOException
+    {
+        registerMap.put(entry.getId(), entry);
+        if (deleteSource) {
+            FileUtils.moveDirectory(sourceLocation, entry.getModelLocation());
+        }
+    }
+
+    public void updateEntry(String modelId, long timestamp, File updatedModelExternalLocation,
+            boolean deleteSource)
         throws IOException, InterruptedException
     {
-        RegisterUtil.nullCheck(sourceLocation);
-        RegisterUtil.nullCheck(modelId);
+        RegisterUtil.nullCheck(updatedModelExternalLocation);
 
-        RegisterEntry model = registerMap.get(modelId);
-        if (RegisterUtil.isNull(model)) {
+        Entry entry = registerMap.get(modelId);
+        if (RegisterUtil.isNull(entry)) {
             logger.debug("No model with id [" + modelId + "] found - will create a new model");
-            File inStorageLocation = getDestinationInStorage(modelId, timestamp);
-            FileUtils.moveDirectory(sourceLocation, inStorageLocation);
-
-            model = new RegisterEntry(modelId, timestamp, inStorageLocation);
-            registerMap.put(modelId, model);
+            entry = new Entry(rootFolder, modelId, timestamp);
+            File fileSystemPath = entry.getFileSystemPath();
+            FileUtils.moveDirectory(updatedModelExternalLocation, fileSystemPath);
+            registerMap.put(modelId, entry);
             return;
         }
 
-        logger.debug("Existing model found with id [" + modelId + "] which will be updated");
-        File inStorageLocation = getDestinationInStorage(modelId, timestamp);
+        logger.debug("Existing model found (id: [" + entry.toString() + "])");
+        File pathToOldVersion = entry.getFileSystemPath();
 
-        ensureStorageLocationDoesNotExist(inStorageLocation);
-        FileUtils.moveDirectory(sourceLocation, inStorageLocation);
-        model.updateModel(inStorageLocation, timestamp);
+        entry.timestamp = timestamp;
+        File pathToInternalLocation = entry.getFileSystemPath();
+        FileUtils.moveDirectory(updatedModelExternalLocation, pathToInternalLocation);
 
-    }
+        FileUtils.deleteDirectory(pathToOldVersion);
+        logger.info("Deleted old version [" + pathToOldVersion.getAbsolutePath() + "]");
 
-    private void ensureStorageLocationDoesNotExist(File inStorageLocation)
-    {
-        if (inStorageLocation.exists()) {
-            throw new IllegalStateException("A folder at location ["
-                    + inStorageLocation.getAbsolutePath() + "] already exists");
+        if (deleteSource) {
+            logger.info("Deleted source version of new model originally located at ["
+                    + updatedModelExternalLocation.getAbsolutePath() + "]");
+            FileUtils.deleteDirectory(updatedModelExternalLocation);
         }
-    }
 
-    private File getDestinationInStorage(String id, long timeStamp)
-    {
-        return new File(storeRootDirectory, id + "_" + timeStamp);
     }
 
     public List<String> getEntryIds()
@@ -89,32 +93,49 @@ public class Register
         return new ArrayList<String>(registerMap.keySet());
     }
 
-    public RegisterEntry getEntry(String id)
+    public Entry getEntry(String id)
     {
-        RegisterEntry model = registerMap.get(id);
+        Entry model = registerMap.get(id);
         return model;
     }
 
-    public void dumpStorageToJson(File serializationTarget) throws IOException
+    void restoreSerializedEntry(Entry entry)
     {
-        RegisterJsonDeSerializer.serialize(this, serializationTarget);
-    }
-
-    public void loadStorageFromJson(File deserializsationSource) throws JSONException, IOException
-    {
-        RegisterJsonDeSerializer.deserialize(deserializsationSource);
-    }
-
-    public void addNewEntry(RegisterEntry entry)
-    {
-        logger.info("Register new entry with id/timestemps [" + entry.getId() + "/"
-                + entry.getTimeStamp() + "]");
-        RegisterEntry e = registerMap.get(entry.getId());
-        if (!RegisterUtil.isNull(e)) {
-            throw new IllegalStateException(
-                    "The entry with id [" + entry.getId() + "] exists already");
-        }
-
         registerMap.put(entry.getId(), entry);
     }
+
+    public void screenFolderAndLoad()
+    {
+        registerMap.clear();
+
+        File[] files = rootFolder.listFiles(new FileFilter()
+        {
+
+            @Override
+            public boolean accept(File pathname)
+            {
+                return pathname.isDirectory();
+            }
+        });
+
+        StringBuilder sb = new StringBuilder();
+        for (File f : files) {
+            sb.append(f.getAbsolutePath() + ",");
+        }
+        logger.info("Root folder [" + rootFolder.getAbsolutePath() + "] contains [" + sb.toString()
+                + "] folders");
+
+        for (File file : files) {
+            String name = file.getName();
+            int sepIdx = name.lastIndexOf(TIMESTAMP_SEP);
+            String id = name.substring(0, sepIdx);
+            long timestamp = Long.parseLong(name.substring(sepIdx+1));
+            registerMap.put(id, new Entry(rootFolder, id, timestamp));
+
+            logger.info("Loaded item with id: [" + id + "] named [" + file.getName()
+                    + "] in root directory [" + rootFolder.getAbsolutePath() + "]");
+
+        }
+    }
+
 }

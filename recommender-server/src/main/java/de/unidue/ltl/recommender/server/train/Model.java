@@ -16,16 +16,40 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.model;
+package de.unidue.ltl.recommender.server.train;
 
 import java.io.File;
 
-import de.unidue.ltl.recommender.server.train.InceptionModel;
-
-public interface ModelRepository
+public class Model
+    implements InceptionModel
 {
-    InceptionModel getModel(String id);
-    
-    void addModel(String id, long timestamp, File sourceLocation) throws Exception;
+    private String id;
+    private long timestamp;
+    private File modelLocation;
+
+    public Model(String id, long timestamp, File modelLocation)
+    {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.modelLocation = modelLocation;
+    }
+
+    @Override
+    public String getId()
+    {
+        return id;
+    }
+
+    @Override
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+    @Override
+    public File getFileSystemLocation()
+    {
+        return modelLocation;
+    }
 
 }
