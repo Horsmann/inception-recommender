@@ -18,6 +18,7 @@
 package de.unidue.ltl.recommender.server.tc.prediction;
 
 import java.io.File;
+import java.util.List;
 
 import de.unidue.ltl.recommender.server.InceptionRequest;
 
@@ -25,5 +26,5 @@ public interface Predictor
 {
     void predict(InceptionRequest req, File model) throws Exception;
 
-    String getResults();
+    List<String> getResults() throws Exception;
 }

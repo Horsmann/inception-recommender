@@ -19,6 +19,7 @@
 package de.unidue.ltl.recommender.server;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +31,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import de.unidue.ltl.recommender.server.modelrep.ModelRepository;
 import de.unidue.ltl.recommender.server.tc.prediction.Predictor;
@@ -68,18 +73,27 @@ public class RequestController
     public ResponseEntity<String> executePrediction(@RequestBody InceptionRequest inceptionReq)
     {
         String xmlCAS = "-init-";
-
+        
         try {
             Predictor p = new TcInceptionRecommenderPredictor();
             InceptionRecommenderModel model = repository.getModel(inceptionReq.layer);
             p.predict(inceptionReq, model.getFileSystemLocation());
-            xmlCAS = p.getResults();
+            List<String> results = p.getResults();
+            xmlCAS = buildResponse(results);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(xmlCAS, HttpStatus.OK);
+    }
+
+    private String buildResponse(List<String> results) throws JsonProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        String arrayToJson = objectMapper.writeValueAsString(results);
+        return arrayToJson;
     }
 
     @ExceptionHandler

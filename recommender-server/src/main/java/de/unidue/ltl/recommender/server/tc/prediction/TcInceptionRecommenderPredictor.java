@@ -18,8 +18,13 @@
 package de.unidue.ltl.recommender.server.tc.prediction;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.uima.util.FileUtils;
+import org.apache.commons.io.FileUtils;
+
+import com.google.common.io.Files;
 
 import de.unidue.ltl.recommender.core.predict.PredictionWithModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
@@ -33,8 +38,7 @@ public class TcInceptionRecommenderPredictor
     public TcInceptionRecommenderPredictor() throws Exception
     {
 
-        resultOut = FileUtils.createTempDir(new File(System.getProperty("java.io.tmpdir")),
-                "predictionOutput" + System.currentTimeMillis());
+        resultOut = Files.createTempDir();
 
         pwm = new PredictionWithModel(resultOut);
     }
@@ -46,10 +50,24 @@ public class TcInceptionRecommenderPredictor
     }
 
     @Override
-    public String getResults()
+    public List<String> getResults() throws Exception
     {
-        // TODO Auto-generated method stub
-        return null;
+        File [] files = resultOut.listFiles(new FileFilter()
+        {
+            @Override
+            public boolean accept(File pathname)
+            {
+                return pathname.getName().endsWith(".txt");
+            }
+        });
+        
+        List<String> casAsString = new ArrayList<>();
+        
+        for(File f : files) {
+            casAsString.add(FileUtils.readFileToString(f, "utf8"));
+        }
+        
+        return casAsString;
     }
 
 }
