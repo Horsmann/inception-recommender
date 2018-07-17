@@ -16,16 +16,26 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.model;
+package de.unidue.ltl.recommender.server.log;
 
-import java.io.File;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-import de.unidue.ltl.recommender.server.train.InceptionModel;
-
-public interface ModelRepository
+@Configuration
+public class RequestLoggingFilterConfig
 {
-    InceptionModel getModel(String id);
-    
-    void addModel(String id, long timestamp, File sourceLocation) throws Exception;
 
+    @Bean
+    public CommonsRequestLoggingFilter logFilter()
+    {
+        CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
+        filter.setIncludeQueryString(true);
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(50);
+        filter.setIncludeHeaders(true);
+        filter.setAfterMessagePrefix("[");
+        filter.setAfterMessageSuffix("]");
+        return filter;
+    }
 }

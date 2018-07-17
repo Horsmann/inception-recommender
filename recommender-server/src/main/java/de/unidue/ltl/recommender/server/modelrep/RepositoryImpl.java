@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.model;
+package de.unidue.ltl.recommender.server.modelrep;
 
 import java.io.File;
 

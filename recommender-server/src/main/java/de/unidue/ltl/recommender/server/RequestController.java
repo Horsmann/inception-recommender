@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.train;
+package de.unidue.ltl.recommender.server;
 
 import java.io.IOException;
 
@@ -31,8 +31,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.unidue.ltl.recommender.server.InceptionRequest;
-import de.unidue.ltl.recommender.server.model.ModelRepository;
+import de.unidue.ltl.recommender.server.modelrep.ModelRepository;
+import de.unidue.ltl.recommender.server.train.InceptionModel;
+import de.unidue.ltl.recommender.server.train.InceptionTrainer;
+import de.unidue.ltl.recommender.server.train.Trainer;
 
 @RestController
 public class RequestController
