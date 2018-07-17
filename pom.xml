@@ -65,6 +65,50 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+	  <profile>
+      <id>rat-check</id>
+      <activation>
+        <file>
+          <exists>.activate_rat-check</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.rat</groupId>
+            <artifactId>apache-rat-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <configuration>
+                  <excludes>
+                    <!-- release generated artifact -->
+                    <exclude>release.properties</exclude>
+                    <!-- informational files -->
+                    <exclude>CHANGES.txt</exclude>
+                    <exclude>NOTICE.txt</exclude>
+                    <exclude>README.txt</exclude>
+                    <exclude>README.md</exclude>
+                    <!-- build artifacts -->
+                    <exclude>.activate_rat-check</exclude>
+                    <exclude>target.db</exclude>
+                    <!-- resources which may not be able to carry headers -->
+                    <exclude>src/main/resources/**/*</exclude>
+                    <exclude>src/test/resources/**/*</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    </profiles>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
