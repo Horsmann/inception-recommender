@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
 
 import de.unidue.ltl.recommender.register.Register;
 import de.unidue.ltl.recommender.register.Entry;
+import de.unidue.ltl.recommender.server.tc.train.TcModel;
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
-import de.unidue.ltl.recommender.server.train.tc.TcModel;
 
 @Component
 public class ModelRepositoryImpl

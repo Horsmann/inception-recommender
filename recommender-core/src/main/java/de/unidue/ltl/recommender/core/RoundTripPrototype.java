@@ -30,7 +30,7 @@ import com.google.gson.JsonParser;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import de.tudarmstadt.ukp.dkpro.core.io.bincas.BinaryCasReader;
-import de.unidue.ltl.recommender.core.predict.PredictionAnnotator;
+import de.unidue.ltl.recommender.core.predict.ResultWriterAnnotator;
 import de.unidue.ltl.recommender.core.train.TrainingOutcomeAnnotator;
 import de.unidue.ltl.recommender.core.util.CoreUtil;
 
@@ -96,10 +96,10 @@ public class RoundTripPrototype
                 TcAnnotator.PARAM_RETAIN_TARGETS, false);
         
         AnalysisEngineDescription out = AnalysisEngineFactory.createEngineDescription(
-                PredictionAnnotator.class,
-                PredictionAnnotator.PARAM_ANNOTATION_TARGET, annotation, 
-                PredictionAnnotator.PARAM_ANNOTATION_TARGET_TYPE, type,
-                PredictionAnnotator.PARAM_OUTPUT_FOLDER, System.getProperty("user.home")+"/Desktop/");
+                ResultWriterAnnotator.class,
+                ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_NAME, annotation, 
+                ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_FIELD_NAME, type,
+                ResultWriterAnnotator.PARAM_OUTPUT_FOLDER, System.getProperty("user.home")+"/Desktop/");
         
         SimplePipeline.runPipeline(reader, annotator, out);
         

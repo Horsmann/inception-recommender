@@ -32,9 +32,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.unidue.ltl.recommender.server.modelrep.ModelRepository;
+import de.unidue.ltl.recommender.server.tc.prediction.Predictor;
+import de.unidue.ltl.recommender.server.tc.prediction.TcInceptionRecommenderPredictor;
+import de.unidue.ltl.recommender.server.tc.train.TcInceptionRecommenderTrainer;
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 import de.unidue.ltl.recommender.server.train.Trainer;
-import de.unidue.ltl.recommender.server.train.tc.TcInceptionRecommenderTrainer;
 
 @RestController
 public class RequestController
@@ -65,7 +67,19 @@ public class RequestController
     @RequestMapping(value = "/predict", method = RequestMethod.POST)
     public ResponseEntity<String> executePrediction(@RequestBody InceptionRequest inceptionReq)
     {
-        return new ResponseEntity<>(HttpStatus.OK);
+        String xmlCAS = "-init-";
+
+        try {
+            Predictor p = new TcInceptionRecommenderPredictor();
+            InceptionRecommenderModel model = repository.getModel(inceptionReq.layer);
+            p.predict(inceptionReq, model.getFileSystemLocation());
+            xmlCAS = p.getResults();
+        }
+        catch (Exception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(xmlCAS, HttpStatus.OK);
     }
 
     @ExceptionHandler

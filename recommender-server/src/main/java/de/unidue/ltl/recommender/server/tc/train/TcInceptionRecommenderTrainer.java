@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.train.tc;
+package de.unidue.ltl.recommender.server.tc.train;
 
 import java.io.File;
 
@@ -24,7 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.unidue.ltl.recommender.core.train.TrainModel;
+import de.unidue.ltl.recommender.core.train.TrainNewModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 import de.unidue.ltl.recommender.server.train.Trainer;
@@ -48,7 +48,7 @@ public class TcInceptionRecommenderTrainer
 
         logger.info("Will store model temporary at [" + modelLocation.getAbsolutePath() + "]");
 
-        TrainModel model = new TrainModel();
+        TrainNewModel model = new TrainNewModel();
         model.run(cas, typesystem, id, target, modelLocation);
 
         logger.info("Will create model with id [" + id + "] at location ["

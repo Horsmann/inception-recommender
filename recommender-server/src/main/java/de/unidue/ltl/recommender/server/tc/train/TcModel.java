@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.train.tc;
+package de.unidue.ltl.recommender.server.tc.train;
 
 import java.io.File;
 

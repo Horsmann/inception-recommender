@@ -73,7 +73,7 @@ public class TrainModelTest
     @Test
     public void runTrain() throws Exception
     {
-        TrainModel m = new TrainModel();
+        TrainNewModel m = new TrainNewModel();
         m.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName, modelLocation);
         
         assertTrue(modelLocation.exists());

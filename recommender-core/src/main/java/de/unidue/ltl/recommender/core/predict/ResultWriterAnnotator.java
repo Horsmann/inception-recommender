@@ -41,15 +41,15 @@ import de.tudarmstadt.ukp.dkpro.core.api.featurepath.FeaturePathUtils;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.unidue.ltl.recommender.core.util.CoreUtil;
 
-public class PredictionAnnotator
+public class ResultWriterAnnotator
     extends JCasAnnotator_ImplBase
 {
-    public static final String PARAM_ANNOTATION_TARGET = "inputAnnotation";
-    @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET, mandatory = true)
+    public static final String PARAM_ANNOTATION_TARGET_NAME = "annotationName";
+    @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET_NAME, mandatory = true)
     private String annotation;
 
-    public static final String PARAM_ANNOTATION_TARGET_TYPE = "inputAnnotationType";
-    @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET_TYPE, mandatory = true)
+    public static final String PARAM_ANNOTATION_TARGET_FIELD_NAME = "annotationFieldName";
+    @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET_FIELD_NAME, mandatory = true)
     private String annoValue;
 
     public static final String PARAM_OUTPUT_FOLDER = "outputFolder";
@@ -64,7 +64,6 @@ public class PredictionAnnotator
     public void initialize(final UimaContext context) throws ResourceInitializationException
     {
         super.initialize(context);
-
     }
 
     int casCounter = 0;
