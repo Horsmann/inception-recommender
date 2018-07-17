@@ -18,7 +18,6 @@
 
 package de.unidue.ltl.recommender.register;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,16 +28,15 @@ import org.slf4j.LoggerFactory;
 public class Entry
 {
     private static final Logger logger = LoggerFactory.getLogger(Entry.class.getName());
-
+    
     private AtomicInteger modelAccesses = new AtomicInteger(0);
     private Semaphore modelUpdateOperation = new Semaphore(1, true);
     long timestamp;
     String id;
-    File root;
+    
 
-    public Entry(File rootFolder, String modelId, long timestamp)
+    public Entry(String modelId, long timestamp)
     {
-        this.root= rootFolder;
         this.id = modelId;
         this.timestamp = timestamp;
     }
@@ -52,11 +50,6 @@ public class Entry
         this.timestamp = timestamp;
 
         modelUpdateOperation.release();
-    }
-
-    File getFileSystemPath()
-    {
-        return new File(root, this.id + "_" + this.timestamp);
     }
 
     public synchronized void beginReadAccess() throws InterruptedException
@@ -95,11 +88,6 @@ public class Entry
         return id;
     }
 
-    public File getModelLocation()
-    {
-        return getFileSystemPath();
-    }
-
     Integer getNumberOfModelAccesses()
     {
         return modelAccesses.get();
@@ -107,7 +95,7 @@ public class Entry
 
     public String toString()
     {
-        return "[" + id + "] / [" + timestamp + "] / [" + getFileSystemPath() + "]";
+        return "[" + id + "] / [" + timestamp + "]";
     }
 
 }

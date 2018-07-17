@@ -22,5 +22,5 @@ import de.unidue.ltl.recommender.server.InceptionRequest;
 
 public interface Trainer
 {
-    InceptionModel train(InceptionRequest req) throws Exception;
+    InceptionRecommenderModel train(InceptionRequest req) throws Exception;
 }

@@ -20,12 +20,47 @@ package de.unidue.ltl.recommender.server.modelrep;
 
 import java.io.File;
 
-import de.unidue.ltl.recommender.server.train.InceptionModel;
+import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 
 public interface ModelRepository
 {
-    InceptionModel getModel(String id);
-    
-    void addModel(String id, long timestamp, File sourceLocation) throws Exception;
+    /**
+     * Retrieves a model by its id from the model repository
+     * 
+     * @param id
+     *            the id value
+     * @return a model
+     */
+    InceptionRecommenderModel getModel(String id);
 
+    /**
+     * Checks in a model into the repository. If a model with the specified id does not exist yet a
+     * new model is registered otherwise the existing entry is overwritten.
+     * 
+     * @param id
+     *            the id of the model
+     * @param timestamp
+     *            a timestamp to track when a model was created
+     * @param sourceLocation
+     *            the location of the model in the filesystem
+     * @param deleteSourceLocation
+     *            if the model at the source location shall be deleted after copying the folder into
+     *            the repository
+     * @throws Exception
+     *             in case of an error
+     */
+    void checkInModel(String id, long timestamp, File sourceLocation, boolean deleteSourceLocation)
+        throws Exception;
+
+    /**
+     * Checks in a model into the repository. If a model with the specified id does not exist yet a
+     * new model is registered otherwise the existing entry is overwritten.
+     * 
+     * @param irm
+     *          a trained inception recommender model
+     * @throws Exception
+     *          in case of any error
+     */
+    void checkInModel(InceptionRecommenderModel irm, boolean deleteSourceLocation)
+            throws Exception;
 }

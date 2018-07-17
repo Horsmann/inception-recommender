@@ -27,14 +27,15 @@ import org.springframework.stereotype.Component;
 
 import de.unidue.ltl.recommender.register.Register;
 import de.unidue.ltl.recommender.register.Entry;
-import de.unidue.ltl.recommender.server.train.InceptionModel;
-import de.unidue.ltl.recommender.server.train.Model;
+import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
+import de.unidue.ltl.recommender.server.train.tc.TcModel;
 
 @Component
-public class RepositoryImpl
+public class ModelRepositoryImpl
     implements ModelRepository
 {
-    private static final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class.getName());
+    private static final Logger logger = LoggerFactory
+            .getLogger(ModelRepositoryImpl.class.getName());
 
     Register register;
 
@@ -51,27 +52,40 @@ public class RepositoryImpl
     }
 
     @Override
-    public InceptionModel getModel(String id)
+    public InceptionRecommenderModel getModel(String id)
     {
         init();
         Entry entry = register.getEntry(id);
 
-        return new Model(entry.getId(), entry.getTimeStamp(), entry.getModelLocation());
+        return new TcModel(entry.getId(), entry.getTimeStamp(),
+                register.getFileSystemLocationOfEntry(entry.getId()));
     }
 
     @Override
-    public void addModel(String id, long timestamp, File sourceLocation) throws Exception
+    public void checkInModel(String id, long timestamp, File sourceLocation,
+            boolean deleteSourceLocation)
+        throws Exception
     {
         init();
 
         if (exists(id)) {
             logger.info("The model with [" + id + "] already exists - will update existing entry");
-            register.updateEntry(id, timestamp, sourceLocation, true);
+            register.updateEntry(id, timestamp, sourceLocation, deleteSourceLocation);
             return;
         }
 
-        Entry entry = new Entry(repositoryRoot, id, timestamp);
-        register.addEntry(entry, sourceLocation, true);
+        Entry entry = new Entry(id, timestamp);
+        register.addEntry(entry, sourceLocation, deleteSourceLocation);
+    }
+
+    @Override
+    public void checkInModel(InceptionRecommenderModel irm, boolean deleteSourceLocation)
+        throws Exception
+    {
+        init();
+
+        checkInModel(irm.getId(), irm.getTimestamp(), irm.getFileSystemLocation(),
+                deleteSourceLocation);
     }
 
     private boolean exists(String id)

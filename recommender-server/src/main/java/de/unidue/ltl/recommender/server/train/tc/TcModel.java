@@ -16,16 +16,41 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.train;
+package de.unidue.ltl.recommender.server.train.tc;
 
 import java.io.File;
 
-public interface InceptionModel
+import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
+
+public class TcModel implements InceptionRecommenderModel
 {
-    String getId();
-    
-    long getTimestamp();
-    
-    File getFileSystemLocation(); 
+    private String id;
+    private long timestamp;
+    private File modelLocation;
+
+    public TcModel(String id, long timestamp, File modelLocation)
+    {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.modelLocation = modelLocation;
+    }
+
+    @Override
+    public String getId()
+    {
+        return id;
+    }
+
+    @Override
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+    @Override
+    public File getFileSystemLocation()
+    {
+        return modelLocation;
+    }
 
 }

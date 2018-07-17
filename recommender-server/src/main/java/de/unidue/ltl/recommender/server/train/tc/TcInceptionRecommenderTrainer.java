@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.train;
+package de.unidue.ltl.recommender.server.train.tc;
 
 import java.io.File;
 
@@ -26,15 +26,17 @@ import org.slf4j.LoggerFactory;
 
 import de.unidue.ltl.recommender.core.train.TrainModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
+import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
+import de.unidue.ltl.recommender.server.train.Trainer;
 
-public class InceptionTrainer
+public class TcInceptionRecommenderTrainer
     implements Trainer
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(InceptionTrainer.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TcInceptionRecommenderTrainer.class.getName());
 
     @Override
-    public InceptionModel train(InceptionRequest req) throws Exception
+    public InceptionRecommenderModel train(InceptionRequest req) throws Exception
     {
         String cas = req.getCAS();
         String typesystem = req.getTypesystem();
@@ -52,7 +54,7 @@ public class InceptionTrainer
         logger.info("Will create model with id [" + id + "] at location ["
                 + modelLocation.getAbsolutePath() + "]");
 
-        return new Model(id, timestamps, modelLocation);
+        return new TcModel(id, timestamps, modelLocation);
     }
 
 }

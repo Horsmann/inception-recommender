@@ -15,15 +15,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package de.unidue.ltl.recommender.register;
+
+package de.unidue.ltl.recommender.server.train;
 
 import java.io.File;
 
-public class EntryNameGenerator
+public interface InceptionRecommenderModel
 {
-    public static String generateStorageLocation(File root, Entry entry) {
-        
-        return "";
-    }
+    /**
+     * Identifier of the model
+     * @return
+     *      the id
+     */
+    String getId();
+    
+    /**
+     * The timestamp of the model
+     * @return
+     *      the timestamp
+     */
+    long getTimestamp();
+    
+    /**
+     * Returns the file system location of the inception recommender model
+     * @return
+     *      the model
+     */
+    File getFileSystemLocation(); 
 
 }

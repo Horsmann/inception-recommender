@@ -33,24 +33,27 @@ import org.slf4j.LoggerFactory;
 public class Register
 {
     private static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
-    private static final String TIMESTAMP_SEP = "_";
-    File rootFolder;
+
+    File root;
     Map<String, Entry> registerMap = new HashMap<>();
 
     public Register(File storeRootDirectory)
     {
-        this.rootFolder = storeRootDirectory;
-        RegisterUtil.nullCheck(this.rootFolder);
-        RegisterUtil.createFileSystemLocation(this.rootFolder);
+        this.root = storeRootDirectory;
+        RegisterUtil.nullCheck(this.root);
+        RegisterUtil.createFileSystemLocation(this.root);
         logger.info("Create [" + Register.class.getSimpleName() + "] with root folder located at ["
-                + this.rootFolder.getAbsolutePath() + "]");
+                + this.root.getAbsolutePath() + "]");
     }
 
     public void addEntry(Entry entry, File sourceLocation, boolean deleteSource) throws IOException
     {
         registerMap.put(entry.getId(), entry);
+        File target = FileSystemLocator.locate(root, entry);
+        FileUtils.copyDirectory(sourceLocation, target);
+
         if (deleteSource) {
-            FileUtils.moveDirectory(sourceLocation, entry.getModelLocation());
+            FileUtils.deleteDirectory(sourceLocation);
         }
     }
 
@@ -62,20 +65,16 @@ public class Register
 
         Entry entry = registerMap.get(modelId);
         if (RegisterUtil.isNull(entry)) {
-            logger.debug("No model with id [" + modelId + "] found - will create a new model");
-            entry = new Entry(rootFolder, modelId, timestamp);
-            File fileSystemPath = entry.getFileSystemPath();
-            FileUtils.moveDirectory(updatedModelExternalLocation, fileSystemPath);
-            registerMap.put(modelId, entry);
-            return;
+            throw new IllegalStateException(
+                    "Tried to update model with id [" + modelId + "], which did not exist");
         }
 
         logger.debug("Existing model found (id: [" + entry.toString() + "])");
-        File pathToOldVersion = entry.getFileSystemPath();
+        File pathToOldVersion = FileSystemLocator.locate(root, entry);
 
         entry.timestamp = timestamp;
-        File pathToInternalLocation = entry.getFileSystemPath();
-        FileUtils.moveDirectory(updatedModelExternalLocation, pathToInternalLocation);
+        File pathToInternalLocation = FileSystemLocator.locate(root, entry);
+        FileUtils.copyDirectory(updatedModelExternalLocation, pathToInternalLocation);
 
         FileUtils.deleteDirectory(pathToOldVersion);
         logger.info("Deleted old version [" + pathToOldVersion.getAbsolutePath() + "]");
@@ -108,7 +107,7 @@ public class Register
     {
         registerMap.clear();
 
-        File[] files = rootFolder.listFiles(new FileFilter()
+        File[] files = root.listFiles(new FileFilter()
         {
 
             @Override
@@ -122,20 +121,31 @@ public class Register
         for (File f : files) {
             sb.append(f.getAbsolutePath() + ",");
         }
-        logger.info("Root folder [" + rootFolder.getAbsolutePath() + "] contains [" + sb.toString()
+        logger.info("Root folder [" + root.getAbsolutePath() + "] contains [" + sb.toString()
                 + "] folders");
 
         for (File file : files) {
             String name = file.getName();
-            int sepIdx = name.lastIndexOf(TIMESTAMP_SEP);
-            String id = name.substring(0, sepIdx);
-            long timestamp = Long.parseLong(name.substring(sepIdx+1));
-            registerMap.put(id, new Entry(rootFolder, id, timestamp));
+            String id = FileSystemLocator.getId(name);
+            long timeStamp = FileSystemLocator.getTimeStamp(name);
+            registerMap.put(id, new Entry(id, timeStamp));
 
             logger.info("Loaded item with id: [" + id + "] named [" + file.getName()
-                    + "] in root directory [" + rootFolder.getAbsolutePath() + "]");
+                    + "] in root directory [" + root.getAbsolutePath() + "]");
 
         }
+    }
+
+    public File getFileSystemLocationOfEntry(String id)
+    {
+        RegisterUtil.nullCheck(id);
+
+        if (registerMap.containsKey(id)) {
+            throw new IllegalArgumentException("The id [" + id + "] is unknown");
+        }
+        
+
+        return FileSystemLocator.locate(root, registerMap.get(id));
     }
 
 }
