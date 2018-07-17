@@ -27,6 +27,8 @@ import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.dkpro.tc.ml.uima.TcAnnotator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
@@ -36,6 +38,8 @@ import de.unidue.ltl.recommender.core.DKProTcSkeleton;
 public class PredictionWithModel
     extends DKProTcSkeleton
 {
+    private static final Logger logger = LoggerFactory
+            .getLogger(PredictionWithModel.class.getName());
 
     File predictionOutput;
 
@@ -63,6 +67,9 @@ public class PredictionWithModel
             File model, String annotationName, String annotationFieldName)
         throws Exception
     {
+
+        logger.info("Start prediction pipeline with model [" + model.getAbsolutePath()
+                + "], results will be stored at [" + predictionOutput.getAbsolutePath() + "]");
 
         CollectionReaderDescription reader = CollectionReaderFactory.createReaderDescription(
                 BinaryCasReader.class, BinaryCasReader.PARAM_MERGE_TYPE_SYSTEM, true,

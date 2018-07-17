@@ -55,6 +55,7 @@ public class ModelRepositoryImpl
     public InceptionRecommenderModel getModel(String id)
     {
         init();
+        logger.debug("Retrieve model with id [" + id + "]");
         Entry entry = register.getEntry(id);
 
         return new TcModel(entry.getId(), entry.getTimeStamp(),

@@ -20,7 +20,6 @@ package de.unidue.ltl.recommender.server.tc.prediction;
 import java.io.File;
 
 import de.unidue.ltl.recommender.server.InceptionRequest;
-import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 
 public interface Predictor
 {

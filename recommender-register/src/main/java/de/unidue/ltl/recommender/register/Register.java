@@ -140,7 +140,7 @@ public class Register
     {
         RegisterUtil.nullCheck(id);
 
-        if (registerMap.containsKey(id)) {
+        if (!registerMap.containsKey(id)) {
             throw new IllegalArgumentException("The id [" + id + "] is unknown");
         }
         
