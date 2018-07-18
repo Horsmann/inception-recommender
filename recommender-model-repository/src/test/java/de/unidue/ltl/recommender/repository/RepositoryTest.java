@@ -31,14 +31,14 @@ import org.junit.rules.TemporaryFolder;
 import de.unidue.ltl.recommender.repository.Entry;
 import de.unidue.ltl.recommender.repository.ModelRepository;
 
-public class RegisterTest
+public class RepositoryTest
 {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
     public TemporaryFolder modelDummyOne = new TemporaryFolder();
     public TemporaryFolder modelDummyTwo = new TemporaryFolder();
 
-    ModelRepository storage;
+    ModelRepository repository;
 
     @Before
     public void setup() throws IOException
@@ -47,52 +47,52 @@ public class RegisterTest
         modelDummyOne.create();
         modelDummyTwo.create();
 
-        storage = new ModelRepository(folder.getRoot());
+        repository = new ModelRepository(folder.getRoot());
     }
 
     @Test
     public void testAddModel() throws IOException
     {
         Entry entry = new Entry("ABC", 232389);
-        storage.addEntry(entry, modelDummyOne.getRoot(), true);
-        entry = storage.getEntry("ABC");
+        repository.addEntry(entry, modelDummyOne.getRoot(), true);
+        entry = repository.getEntry("ABC");
         String id = entry.getId();
         long ts = entry.getTimeStamp();
         
         assertEquals("ABC", id);
         assertEquals(232389, ts);
-        assertEquals(1, storage.getEntryIds().size());
+        assertEquals(1, repository.getEntryIds().size());
         
         
         entry = new Entry("ABC-2", 5232389);
         id = entry.getId();
         ts = entry.getTimeStamp();
-        storage.addEntry(entry, modelDummyTwo.getRoot(), true);
+        repository.addEntry(entry, modelDummyTwo.getRoot(), true);
         
         assertEquals("ABC-2", id);
         assertEquals(5232389, ts);
         
-        assertEquals(2, storage.getEntryIds().size());
+        assertEquals(2, repository.getEntryIds().size());
     }
     
     @Test
     public void testOverwriteExistingModel() throws IOException, InterruptedException
     {
         Entry e = new Entry("ABC", 232389);
-        storage.addEntry(e, modelDummyOne.getRoot(), true);
+        repository.addEntry(e, modelDummyOne.getRoot(), true);
         
-        storage.updateEntry(e.id, e.timestamp, modelDummyTwo.getRoot(), true);
+        repository.updateEntry(e.id, e.timestamp, modelDummyTwo.getRoot(), true);
         
     }
 
     @Test(expected = IllegalStateException.class)
     public void testExceptionOnUpdateNonExistingModel() throws IOException, InterruptedException
     {
-        storage.updateEntry("ABC", 123456, modelDummyOne.getRoot(), true);
-        List<String> modelIds = storage.getEntryIds();
+        repository.updateEntry("ABC", 123456, modelDummyOne.getRoot(), true);
+        List<String> modelIds = repository.getEntryIds();
         assertEquals(1, modelIds.size());
 
-        Entry m = storage.getEntry("ABC");
+        Entry m = repository.getEntry("ABC");
         assertEquals("ABC", m.getId());
         assertEquals(123456, m.getTimeStamp());
     }
