@@ -19,7 +19,6 @@
 package de.unidue.ltl.recommender.server;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,14 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import de.unidue.ltl.recommender.server.repository.Repository;
 import de.unidue.ltl.recommender.server.tc.prediction.Predictor;
-import de.unidue.ltl.recommender.server.tc.prediction.TcInceptionRecommenderPredictor;
-import de.unidue.ltl.recommender.server.tc.train.TcInceptionRecommenderTrainer;
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 import de.unidue.ltl.recommender.server.train.Trainer;
 
@@ -49,37 +42,40 @@ public class RequestController
     @Autowired
     Repository repository;
 
+    @Autowired
+    Trainer trainer;
+    
+    @Autowired
+    Predictor predictor;
+
     @RequestMapping(value = "/train", method = RequestMethod.POST)
     public ResponseEntity<String> executeTraining(@RequestBody InceptionRequest inceptionReq)
     {
-
-        InceptionRecommenderModel trainedModel = null;
-        Trainer t = new TcInceptionRecommenderTrainer();
         try {
-            trainedModel = t.train(inceptionReq);
-            repository.checkInModel(trainedModel, true);
+            trainModel(inceptionReq);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<String>(
-                "No errors occured - model located at ["
-                        + trainedModel.getFileSystemLocation().getAbsolutePath() + "]",
-                HttpStatus.OK);
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
+    private InceptionRecommenderModel trainModel(InceptionRequest inceptionReq) throws Exception
+    {
+        InceptionRecommenderModel trainedModel = null;
+        trainedModel = trainer.train(inceptionReq);
+        repository.checkInModel(trainedModel, true);
+        return trainedModel;
     }
 
     @RequestMapping(value = "/predict", method = RequestMethod.POST)
     public ResponseEntity<String> executePrediction(@RequestBody InceptionRequest inceptionReq)
     {
         String xmlCAS = "-init-";
-        
+
         try {
-            Predictor p = new TcInceptionRecommenderPredictor();
-            InceptionRecommenderModel model = repository.getModel(inceptionReq.layer);
-            p.predict(inceptionReq, model.getFileSystemLocation());
-            List<String> results = p.getResults();
-            xmlCAS = buildResponse(results);
+            xmlCAS = prediction(inceptionReq);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -88,12 +84,11 @@ public class RequestController
         return new ResponseEntity<>(xmlCAS, HttpStatus.OK);
     }
 
-    private String buildResponse(List<String> results) throws JsonProcessingException
+    private String prediction(InceptionRequest inceptionReq) throws Exception
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String arrayToJson = objectMapper.writeValueAsString(results);
-        return arrayToJson;
+        InceptionRecommenderModel model = repository.getModel(inceptionReq.layer);
+        predictor.predict(inceptionReq, model.getFileSystemLocation());
+        return predictor.getResultsAsJson();
     }
 
     @ExceptionHandler

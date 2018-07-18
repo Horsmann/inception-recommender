@@ -27,4 +27,6 @@ public interface Predictor
     void predict(InceptionRequest req, File model) throws Exception;
 
     List<String> getResults() throws Exception;
+    
+    String getResultsAsJson() throws Exception;
 }

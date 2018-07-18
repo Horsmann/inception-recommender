@@ -23,12 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.io.Files;
 
 import de.unidue.ltl.recommender.core.predict.PredictionWithModel;
 import de.unidue.ltl.recommender.server.InceptionRequest;
 
+@Component
 public class TcInceptionRecommenderPredictor
     implements Predictor
 {
@@ -68,6 +72,16 @@ public class TcInceptionRecommenderPredictor
         }
         
         return casAsString;
+    }
+    
+    public String getResultsAsJson() throws Exception
+    {
+        List<String> results = getResults();
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        String arrayToJson = objectMapper.writeValueAsString(results);
+        return arrayToJson;
     }
 
 }
