@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.register;
+package de.unidue.ltl.recommender.repository;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -30,26 +30,26 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Register
+public class ModelRepository
 {
-    private static final Logger logger = LoggerFactory.getLogger(Register.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ModelRepository.class.getName());
 
-    File root;
+    File repositoryRoot;
     Map<String, Entry> registerMap = new HashMap<>();
 
-    public Register(File storeRootDirectory)
+    public ModelRepository(File storeRootDirectory)
     {
-        this.root = storeRootDirectory;
-        RegisterUtil.nullCheck(this.root);
-        RegisterUtil.createFileSystemLocation(this.root);
-        logger.info("Create [" + Register.class.getSimpleName() + "] with root folder located at ["
-                + this.root.getAbsolutePath() + "]");
+        this.repositoryRoot = storeRootDirectory;
+        RepositoryUtil.nullCheck(this.repositoryRoot);
+        RepositoryUtil.createFileSystemLocation(this.repositoryRoot);
+        logger.info("Create [" + ModelRepository.class.getSimpleName() + "] with root folder located at ["
+                + this.repositoryRoot.getAbsolutePath() + "]");
     }
 
     public void addEntry(Entry entry, File sourceLocation, boolean deleteSource) throws IOException
     {
         registerMap.put(entry.getId(), entry);
-        File target = FileSystemLocator.locate(root, entry);
+        File target = FileSystemLocator.locate(repositoryRoot, entry);
         FileUtils.copyDirectory(sourceLocation, target);
 
         if (deleteSource) {
@@ -57,23 +57,23 @@ public class Register
         }
     }
 
-    public void updateEntry(String modelId, long timestamp, File updatedModelExternalLocation,
+    public void updateEntry(String id, long timestamp, File updatedModelExternalLocation,
             boolean deleteSource)
         throws IOException, InterruptedException
     {
-        RegisterUtil.nullCheck(updatedModelExternalLocation);
+        RepositoryUtil.nullCheck(updatedModelExternalLocation);
 
-        Entry entry = registerMap.get(modelId);
-        if (RegisterUtil.isNull(entry)) {
+        Entry entry = registerMap.get(id);
+        if (RepositoryUtil.isNull(entry)) {
             throw new IllegalStateException(
-                    "Tried to update model with id [" + modelId + "], which did not exist");
+                    "Tried to update model with id [" + id + "], which did not exist");
         }
 
         logger.debug("Existing model found (id: [" + entry.toString() + "])");
-        File pathToOldVersion = FileSystemLocator.locate(root, entry);
+        File pathToOldVersion = FileSystemLocator.locate(repositoryRoot, entry);
 
         entry.timestamp = timestamp;
-        File pathToInternalLocation = FileSystemLocator.locate(root, entry);
+        File pathToInternalLocation = FileSystemLocator.locate(repositoryRoot, entry);
         FileUtils.copyDirectory(updatedModelExternalLocation, pathToInternalLocation);
 
         FileUtils.deleteDirectory(pathToOldVersion);
@@ -107,7 +107,7 @@ public class Register
     {
         registerMap.clear();
 
-        File[] files = root.listFiles(new FileFilter()
+        File[] files = repositoryRoot.listFiles(new FileFilter()
         {
 
             @Override
@@ -121,7 +121,7 @@ public class Register
         for (File f : files) {
             sb.append(f.getAbsolutePath() + ",");
         }
-        logger.info("Root folder [" + root.getAbsolutePath() + "] contains [" + sb.toString()
+        logger.info("Root folder [" + repositoryRoot.getAbsolutePath() + "] contains [" + sb.toString()
                 + "] folders");
 
         for (File file : files) {
@@ -131,21 +131,21 @@ public class Register
             registerMap.put(id, new Entry(id, timeStamp));
 
             logger.info("Loaded item with id: [" + id + "] named [" + file.getName()
-                    + "] in root directory [" + root.getAbsolutePath() + "]");
+                    + "] in root directory [" + repositoryRoot.getAbsolutePath() + "]");
 
         }
     }
 
     public File getFileSystemLocationOfEntry(String id)
     {
-        RegisterUtil.nullCheck(id);
+        RepositoryUtil.nullCheck(id);
 
         if (!registerMap.containsKey(id)) {
             throw new IllegalArgumentException("The id [" + id + "] is unknown");
         }
         
 
-        return FileSystemLocator.locate(root, registerMap.get(id));
+        return FileSystemLocator.locate(repositoryRoot, registerMap.get(id));
     }
 
 }

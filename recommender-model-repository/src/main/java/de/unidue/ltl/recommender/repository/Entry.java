@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.register;
+package de.unidue.ltl.recommender.repository;
 
 import java.io.IOException;
 import java.util.concurrent.Semaphore;

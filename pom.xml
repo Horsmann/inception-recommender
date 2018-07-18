@@ -30,8 +30,9 @@
 	<modules>
 		<!-- Please keep in alphabetical order -->
 		<module>recommender-core</module>
-		<module>recommender-register</module>
+		
 		<module>recommender-server</module>
+		<module>recommender-model-repository</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

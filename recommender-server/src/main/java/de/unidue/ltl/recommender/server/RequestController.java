@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import de.unidue.ltl.recommender.server.modelrep.ModelRepository;
+import de.unidue.ltl.recommender.server.repository.Repository;
 import de.unidue.ltl.recommender.server.tc.prediction.Predictor;
 import de.unidue.ltl.recommender.server.tc.prediction.TcInceptionRecommenderPredictor;
 import de.unidue.ltl.recommender.server.tc.train.TcInceptionRecommenderTrainer;
@@ -47,7 +47,7 @@ import de.unidue.ltl.recommender.server.train.Trainer;
 public class RequestController
 {
     @Autowired
-    ModelRepository repository;
+    Repository repository;
 
     @RequestMapping(value = "/train", method = RequestMethod.POST)
     public ResponseEntity<String> executeTraining(@RequestBody InceptionRequest inceptionReq)

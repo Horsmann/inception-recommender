@@ -16,7 +16,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.register;
+package de.unidue.ltl.recommender.repository;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +28,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import de.unidue.ltl.recommender.repository.Entry;
+import de.unidue.ltl.recommender.repository.ModelRepository;
+
 public class RegisterTest
 {
     @Rule
@@ -35,7 +38,7 @@ public class RegisterTest
     public TemporaryFolder modelDummyOne = new TemporaryFolder();
     public TemporaryFolder modelDummyTwo = new TemporaryFolder();
 
-    Register storage;
+    ModelRepository storage;
 
     @Before
     public void setup() throws IOException
@@ -44,7 +47,7 @@ public class RegisterTest
         modelDummyOne.create();
         modelDummyTwo.create();
 
-        storage = new Register(folder.getRoot());
+        storage = new ModelRepository(folder.getRoot());
     }
 
     @Test

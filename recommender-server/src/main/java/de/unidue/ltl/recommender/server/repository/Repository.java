@@ -16,13 +16,13 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.modelrep;
+package de.unidue.ltl.recommender.server.repository;
 
 import java.io.File;
 
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 
-public interface ModelRepository
+public interface Repository
 {
     /**
      * Retrieves a model by its id from the model repository

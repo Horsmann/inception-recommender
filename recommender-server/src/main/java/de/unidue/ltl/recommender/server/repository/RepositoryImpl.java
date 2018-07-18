@@ -16,38 +16,42 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.server.modelrep;
+package de.unidue.ltl.recommender.server.repository;
 
 import java.io.File;
+
+/*
+ * Wrapper class for the repository
+ */
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import de.unidue.ltl.recommender.register.Register;
-import de.unidue.ltl.recommender.register.Entry;
+import de.unidue.ltl.recommender.repository.Entry;
+import de.unidue.ltl.recommender.repository.ModelRepository;
 import de.unidue.ltl.recommender.server.tc.train.TcModel;
 import de.unidue.ltl.recommender.server.train.InceptionRecommenderModel;
 
 @Component
-public class ModelRepositoryImpl
-    implements ModelRepository
+public class RepositoryImpl
+    implements Repository
 {
     private static final Logger logger = LoggerFactory
-            .getLogger(ModelRepositoryImpl.class.getName());
+            .getLogger(RepositoryImpl.class.getName());
 
-    Register register;
+    ModelRepository rep;
 
     @Value("${repositoryRoot}")
     File repositoryRoot;
 
     private void init()
     {
-        if (register == null) {
+        if (rep == null) {
             logger.info("Initializing with root directory located at [" + repositoryRoot + "]");
-            register = new Register(repositoryRoot);
-            register.screenFolderAndLoad();
+            rep = new ModelRepository(repositoryRoot);
+            rep.screenFolderAndLoad();
         }
     }
 
@@ -56,10 +60,10 @@ public class ModelRepositoryImpl
     {
         init();
         logger.debug("Retrieve model with id [" + id + "]");
-        Entry entry = register.getEntry(id);
+        Entry entry = rep.getEntry(id);
 
         return new TcModel(entry.getId(), entry.getTimeStamp(),
-                register.getFileSystemLocationOfEntry(entry.getId()));
+                rep.getFileSystemLocationOfEntry(entry.getId()));
     }
 
     @Override
@@ -71,12 +75,12 @@ public class ModelRepositoryImpl
 
         if (exists(id)) {
             logger.info("The model with [" + id + "] already exists - will update existing entry");
-            register.updateEntry(id, timestamp, sourceLocation, deleteSourceLocation);
+            rep.updateEntry(id, timestamp, sourceLocation, deleteSourceLocation);
             return;
         }
 
         Entry entry = new Entry(id, timestamp);
-        register.addEntry(entry, sourceLocation, deleteSourceLocation);
+        rep.addEntry(entry, sourceLocation, deleteSourceLocation);
     }
 
     @Override
@@ -92,7 +96,7 @@ public class ModelRepositoryImpl
     private boolean exists(String id)
     {
         init();
-        return register.getEntryIds().contains(id);
+        return rep.getEntryIds().contains(id);
     }
 
 }

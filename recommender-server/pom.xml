@@ -35,7 +35,7 @@
 		</dependency>
 		<dependency>
 			<groupId>de.unidue.ltl</groupId>
-			<artifactId>recommender-register</artifactId>
+			<artifactId>recommender-model-repository</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

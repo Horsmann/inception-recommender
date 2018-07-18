@@ -16,11 +16,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package de.unidue.ltl.recommender.register;
+package de.unidue.ltl.recommender.repository;
 
 import java.io.File;
 
-public class RegisterUtil
+public class RepositoryUtil
 {
     public static void nullCheck(Object o)
     {
