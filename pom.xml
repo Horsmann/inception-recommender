@@ -30,7 +30,7 @@
 	<modules>
 		<!-- Please keep in alphabetical order -->
 		<module>recommender-core</module>
-		
+
 		<module>recommender-server</module>
 		<module>recommender-model-repository</module>
 	</modules>
@@ -70,50 +70,50 @@
 		</plugins>
 	</build>
 	<profiles>
-	  <profile>
-      <id>rat-check</id>
-      <activation>
-        <file>
-          <exists>.activate_rat-check</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.rat</groupId>
-            <artifactId>apache-rat-plugin</artifactId>
-            <version>0.12</version>
-            <executions>
-              <execution>
-                <id>default</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-                <configuration>
-                  <excludes>
-                    <!-- release generated artifact -->
-                    <exclude>release.properties</exclude>
-                    <!-- informational files -->
-                    <exclude>CHANGES.txt</exclude>
-                    <exclude>NOTICE.txt</exclude>
-                    <exclude>README.txt</exclude>
-                    <exclude>README.md</exclude>
-                    <!-- build artifacts -->
-                    <exclude>.activate_rat-check</exclude>
-                    <exclude>target.db</exclude>
-                    <!-- resources which may not be able to carry headers -->
-                    <exclude>src/main/resources/**/*</exclude>
-                    <exclude>src/test/resources/**/*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    </profiles>
+		<profile>
+			<id>rat-check</id>
+			<activation>
+				<file>
+					<exists>.activate_rat-check</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.rat</groupId>
+						<artifactId>apache-rat-plugin</artifactId>
+						<version>0.12</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								<configuration>
+									<excludes>
+										<!-- release generated artifact -->
+										<exclude>release.properties</exclude>
+										<!-- informational files -->
+										<exclude>CHANGES.txt</exclude>
+										<exclude>NOTICE.txt</exclude>
+										<exclude>README.txt</exclude>
+										<exclude>README.md</exclude>
+										<!-- build artifacts -->
+										<exclude>.activate_rat-check</exclude>
+										<exclude>target.db</exclude>
+										<!-- resources which may not be able to carry headers -->
+										<exclude>src/main/resources/**/*</exclude>
+										<exclude>src/test/resources/**/*</exclude>
+									</excludes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -121,54 +121,12 @@
 				<artifactId>commons-io</artifactId>
 				<version>2.5</version>
 			</dependency>
-			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20180130</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>1.3.0-alpha4</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>1.3.0-alpha4</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.8.0-beta2</version>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
 		</dependency>
 	</dependencies>
 </project>
