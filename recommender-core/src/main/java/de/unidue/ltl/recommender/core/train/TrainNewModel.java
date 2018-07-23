@@ -18,14 +18,15 @@
 
 package de.unidue.ltl.recommender.core.train;
 
+import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngineDescription;
 import static org.apache.uima.fit.factory.CollectionReaderFactory.createReaderDescription;
+import static org.dkpro.tc.api.features.TcFeatureFactory.create;
 
 import java.io.File;
 
 import org.apache.uima.collection.CollectionReaderDescription;
-import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
-import org.dkpro.tc.api.features.TcFeatureFactory;
+import org.dkpro.tc.features.ngram.CharacterNGram;
 import org.dkpro.tc.features.tcu.TargetSurfaceFormContextFeature;
 import org.dkpro.tc.ml.builder.ExperimentBuilder;
 import org.dkpro.tc.ml.builder.ExperimentType;
@@ -73,22 +74,27 @@ public class TrainNewModel
         ExperimentBuilder builder = new ExperimentBuilder();
         builder.experiment(ExperimentType.SAVE_MODEL, "InceptionTrain")
                 .dataReaderTrain(trainReader)
-                .featureMode(FeatureMode.UNIT)
+                .featureMode(FeatureMode.SEQUENCE)
                 .learningMode(LearningMode.SINGLE_LABEL)
                 .outputFolder(targetFolder.getAbsolutePath())
                 .machineLearningBackend(
                         new MLBackend(new CrfSuiteAdapter(),
                                       CrfSuiteAdapter.ALGORITHM_ADAPTIVE_REGULARIZATION_OF_WEIGHT_VECTOR))
-                .preprocessing(AnalysisEngineFactory.createEngineDescription(
+                .preprocessing(createEngineDescription(
                                TrainingOutcomeAnnotator.class,
                                TrainingOutcomeAnnotator.PARAM_ANNOTATION_TARGET_NAME, annotationName,
                                TrainingOutcomeAnnotator.PARAM_ANNOTATION_TARGET_FIELD_NAME, annotationFieldName))
-                .features(TcFeatureFactory.create(TargetSurfaceFormContextFeature.class,
-                          TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, -2),
-                          TcFeatureFactory.create(TargetSurfaceFormContextFeature.class,
-                          TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, -1),
-                        TcFeatureFactory.create(TargetSurfaceFormContextFeature.class,
-                                TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, 0))
+                .features( create(TargetSurfaceFormContextFeature.class,
+                                  TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, -2)
+                          ,create(TargetSurfaceFormContextFeature.class,
+                                  TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, -1)
+                          ,create(TargetSurfaceFormContextFeature.class,
+                                  TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, 0)
+                          ,create(CharacterNGram.class, 
+                                  CharacterNGram.PARAM_NGRAM_USE_TOP_K, 500,
+                                  CharacterNGram.PARAM_NGRAM_MIN_N, 1,
+                                  CharacterNGram.PARAM_NGRAM_MAX_N, 4)
+                        )
                 .run();
 
     }
