@@ -52,9 +52,9 @@ public class ResultWriterAnnotator
     public static final String PARAM_ANNOTATION_TARGET_FIELD_NAME = "annotationFieldName";
     @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET_FIELD_NAME, mandatory = true)
     private String annoValue;
-    
+
     public static final String PARAM_MERGE_ADJACENT_ANNOTATIONS = "mergeAdjecent";
-    @ConfigurationParameter(name = PARAM_MERGE_ADJACENT_ANNOTATIONS, mandatory = true, defaultValue="true")
+    @ConfigurationParameter(name = PARAM_MERGE_ADJACENT_ANNOTATIONS, mandatory = true, defaultValue = "true")
     private boolean mergeAdjacent;
 
     public static final String PARAM_OUTPUT_FOLDER = "outputFolder";
@@ -83,34 +83,25 @@ public class ResultWriterAnnotator
                     TextClassificationOutcome.class, s);
 
             for (int j = 0; j < outcomes.size(); j++) {
-                
-                if(outcomes.get(j).getOutcome().equals(TrainingOutcomeAnnotator.OTHER_OUTCOME)) {
-                    //is class "no class"
+
+                if (outcomes.get(j).getOutcome().equals(TrainingOutcomeAnnotator.OTHER_OUTCOME)) {
+                    // is class "no class"
                     continue;
                 }
-                
+
                 int begin = outcomes.get(j).getBegin();
                 int end = outcomes.get(j).getEnd();
-                
-                int adjacentLen=0;
-                if(mergeAdjacent) {
-                //Look-ahead to merge adjacent annotations of same feature value
-                    adjacentLen=collectNumberOfMergeCandidates(outcomes, j);
-                 end = outcomes.get(j+adjacentLen).getEnd();
+
+                int adjacentLen = 0;
+                if (mergeAdjacent) {
+                    // Look-ahead to merge adjacent annotations of same feature value
+                    adjacentLen = collectNumberOfMergeCandidates(outcomes, j);
+                    end = outcomes.get(j + adjacentLen).getEnd();
                 }
                 
-                Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
-                AnnotationFS targetAnno = aJCas.getCas().createAnnotation(annotationType,
-                        begin, end);
-                Feature featureByBaseName = FeaturePathUtils
-                        .getType(aJCas.getTypeSystem(), annotation).getFeatureByBaseName(annoValue);
-                targetAnno.setFeatureValueFromString(featureByBaseName,
-                        outcomes.get(j).getOutcome());
-                ((Annotation) targetAnno).addToIndexes();
+                annotateTargetAnnotation(aJCas, begin, end, outcomes, j);
 
-                outcomes.get(j).removeFromIndexes();
-                
-                j+=adjacentLen;
+                j += adjacentLen;
             }
         }
 
@@ -124,20 +115,36 @@ public class ResultWriterAnnotator
         }
     }
 
-    private int collectNumberOfMergeCandidates(List<TextClassificationOutcome> outcomes, final int currIdx)
+    private void annotateTargetAnnotation(JCas aJCas, int begin, int end,  final List<TextClassificationOutcome> outcomes, final int currIdx)
     {
-        int k = currIdx+1;
+        String value = outcomes.get(currIdx).getOutcome();
         
-        while(k < outcomes.size()) {
-            if(outcomes.get(k-1).getOutcome().equals(outcomes.get(k).getOutcome())) {
+        Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
+        AnnotationFS targetAnno = aJCas.getCas().createAnnotation(annotationType, begin,
+                end);
+        Feature featureByBaseName = FeaturePathUtils
+                .getType(aJCas.getTypeSystem(), annotation).getFeatureByBaseName(annoValue);
+        targetAnno.setFeatureValueFromString(featureByBaseName, value);
+        ((Annotation) targetAnno).addToIndexes();
+
+        outcomes.get(currIdx).removeFromIndexes();        
+    }
+
+    private int collectNumberOfMergeCandidates(List<TextClassificationOutcome> outcomes,
+            final int currIdx)
+    {
+        int k = currIdx + 1;
+
+        while (k < outcomes.size()) {
+            if (outcomes.get(k - 1).getOutcome().equals(outcomes.get(k).getOutcome())) {
                 k++;
             }
             else {
                 break;
             }
         }
-        
-        return k-currIdx-1;
+
+        return k - currIdx - 1;
     }
 
     private void debugSysOut(JCas aJCas)
@@ -147,44 +154,50 @@ public class ResultWriterAnnotator
         }
 
         Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
-        
+
         List<Token> tokens = new ArrayList<Token>(JCasUtil.select(aJCas, Token.class));
-        List<AnnotationFS> select = new ArrayList<AnnotationFS>(CasUtil.select(aJCas.getCas(), annotationType));
-        
-        for(int i=0; i < tokens.size(); i++) {
+        List<AnnotationFS> select = new ArrayList<AnnotationFS>(
+                CasUtil.select(aJCas.getCas(), annotationType));
+
+        for (int i = 0; i < tokens.size(); i++) {
             Token t = tokens.get(i);
-            
+
             AnnotationFS a = null;
-            for(AnnotationFS afs : select) {
+            for (AnnotationFS afs : select) {
                 if (tokens.get(i).getBegin() == afs.getBegin()) {
                     a = afs;
                     break;
-                } else if(tokens.get(i).getBegin() > afs.getBegin() && tokens.get(i).getEnd() < afs.getEnd()) {
+                }
+                else if (tokens.get(i).getBegin() > afs.getBegin()
+                        && tokens.get(i).getEnd() < afs.getEnd()) {
                     a = afs;
                     break;
-                }else if(tokens.get(i).getEnd() == afs.getEnd()) {
+                }
+                else if (tokens.get(i).getEnd() == afs.getEnd()) {
                     a = afs;
                     break;
                 }
             }
-            String predictionEntry="";
-            if(a!=null) {
-                Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
-                .getFeatureByBaseName(annoValue);
+            String predictionEntry = "";
+            if (a != null) {
+                Feature featureByBaseName = FeaturePathUtils
+                        .getType(aJCas.getTypeSystem(), annotation).getFeatureByBaseName(annoValue);
                 predictionEntry = " " + a.getFeatureValueAsString(featureByBaseName);
-            }else {
-                predictionEntry="--";
             }
-            
-            System.out.println(String.format("%5d %5d %20s %15s", t.getBegin(), t.getEnd(), t.getCoveredText(), predictionEntry));
+            else {
+                predictionEntry = "--";
+            }
+
+            System.out.println(String.format("%5d %5d %25s %15s", t.getBegin(), t.getEnd(),
+                    t.getCoveredText(), predictionEntry));
         }
-        
-//        for (AnnotationFS s : select) {
-//            Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
-//                    .getFeatureByBaseName(annoValue);
-//            System.out.println(
-//                    s.getCoveredText() + " " + s.getFeatureValueAsString(featureByBaseName));
-//        }
+
+        // for (AnnotationFS s : select) {
+        // Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
+        // .getFeatureByBaseName(annoValue);
+        // System.out.println(
+        // s.getCoveredText() + " " + s.getFeatureValueAsString(featureByBaseName));
+        // }
     }
 
     private void serializeCas(JCas aJCas, int c) throws Exception
