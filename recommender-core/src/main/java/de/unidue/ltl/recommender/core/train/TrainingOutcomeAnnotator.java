@@ -31,9 +31,11 @@ import org.apache.uima.fit.util.CasUtil;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.dkpro.tc.api.type.TextClassificationOutcome;
+import org.dkpro.tc.api.type.TextClassificationSequence;
 import org.dkpro.tc.api.type.TextClassificationTarget;
 
 import de.tudarmstadt.ukp.dkpro.core.api.featurepath.FeaturePathUtils;
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 
 public class TrainingOutcomeAnnotator
@@ -64,6 +66,8 @@ public class TrainingOutcomeAnnotator
         List<Token> tokens = new ArrayList<Token>(JCasUtil.select(aJCas, Token.class));
         List<AnnotationFS> classificationTargets = new ArrayList<AnnotationFS>(
                 CasUtil.select(aJCas.getCas(), annotationType));
+        
+        //Annotate the targets
         for (AnnotationFS a : classificationTargets) {
 
             TextClassificationTarget aTarget = new TextClassificationTarget(aJCas, a.getBegin(),
@@ -75,6 +79,12 @@ public class TrainingOutcomeAnnotator
                     a.getEnd());
             outcome.setOutcome(a.getFeatureValueAsString(feature));
             outcome.addToIndexes();
+        }
+        
+        //All sentences are fixed annotated as the objective sequence
+        for(Sentence s : JCasUtil.select(aJCas, Sentence.class)) {
+            TextClassificationSequence classSeq = new TextClassificationSequence(aJCas, s.getBegin(), s.getEnd());
+            classSeq.addToIndexes();
         }
 
         if (!classificationTargets.isEmpty()) {
