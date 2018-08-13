@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.dkpro.tc.core.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -141,12 +142,15 @@ public class RoundTripTest
         m.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName,
                 modelLocation.getRoot());
         assertTrue(modelLocation.getRoot().exists());
-        File theModel = new File(modelLocation.getRoot(), "classifier.ser");
+        File theModel = new File(modelLocation.getRoot(), Constants.MODEL_CLASSIFIER);
         assertTrue(theModel.exists());
     }
 
     private void initTrain() throws IOException
     {
+//        String json = FileUtils
+//                .readFileToString(new File(System.getProperty("user.home")+"/Desktop/training.json"), "utf-8");
+        
         String json = FileUtils
                 .readFileToString(new File("src/test/resources/jsonTrainRequestV2small.txt"), "utf-8");
 

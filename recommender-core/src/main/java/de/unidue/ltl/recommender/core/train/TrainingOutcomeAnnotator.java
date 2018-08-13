@@ -92,10 +92,7 @@ public class TrainingOutcomeAnnotator
             classSeq.addToIndexes();
         }
 
-        if (!classificationTargets.isEmpty()) {
-            annotateTokensWithoutCoveringTargetAsOther(aJCas, tokens,
-                    classificationTargets.get(classificationTargets.size() - 1));
-        }
+        annotateTokensWithoutCoveringTargetAsOther(aJCas, tokens, annotationType);
     }
 
     private void loadTypeInformation(JCas aJCas)
@@ -112,15 +109,13 @@ public class TrainingOutcomeAnnotator
     }
 
     private void annotateTokensWithoutCoveringTargetAsOther(JCas aJCas, List<Token> tokens,
-            AnnotationFS lastAnnotatedToken)
+            Type annotationType)
     {
         for (Token t : tokens) {
-            if (t.getEnd() >= lastAnnotatedToken.getEnd()) {
-                break;
-            }
-            List<AnnotationFS> coveredAnnotations = CasUtil.selectCovered(t.getType(),
-                    lastAnnotatedToken);
-            if (!coveredAnnotations.isEmpty()) {
+             
+            List<TextClassificationTarget> targets = JCasUtil.selectCovered(aJCas, TextClassificationTarget.class, t);
+            if(!targets.isEmpty()) {
+                //some target is there i.e. has been annotated with a target - skip
                 continue;
             }
 
