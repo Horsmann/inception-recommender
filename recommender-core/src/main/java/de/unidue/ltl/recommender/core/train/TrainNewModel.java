@@ -46,7 +46,7 @@ public class TrainNewModel
         super();
     }
 
-    public void run(String casBase64, String typeSystemBase64, String annotationName,
+    public void run(String [] casBase64, String typeSystemBase64, String annotationName,
             String annotationFieldName, File targetFolder)
         throws Exception
     {
@@ -66,7 +66,7 @@ public class TrainNewModel
     {
 
         CollectionReaderDescription trainReader = createReaderDescription(BinaryCasReader.class,
-                typeSystem, BinaryCasReader.PARAM_LANGUAGE, "de",
+                typeSystem, BinaryCasReader.PARAM_LANGUAGE, "x-undefined",
                 BinaryCasReader.PARAM_SOURCE_LOCATION, casPredictOutput.getAbsolutePath(),
                 BinaryCasReader.PARAM_PATTERNS, "*.bin");
 

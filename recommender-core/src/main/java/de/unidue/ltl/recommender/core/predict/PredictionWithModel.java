@@ -50,7 +50,7 @@ public class PredictionWithModel
     }
 
     @Override
-    public void run(String casBase64, String typeSystemBase64, String annotationName,
+    public void run(String [] casBase64, String typeSystemBase64, String annotationName,
             String annotationFieldName, File model)
         throws Exception
     {
@@ -73,7 +73,7 @@ public class PredictionWithModel
 
         CollectionReaderDescription reader = CollectionReaderFactory.createReaderDescription(
                 BinaryCasReader.class, BinaryCasReader.PARAM_MERGE_TYPE_SYSTEM, true,
-                BinaryCasReader.PARAM_LANGUAGE, "en", BinaryCasReader.PARAM_SOURCE_LOCATION,
+                BinaryCasReader.PARAM_LANGUAGE, "x-undefined", BinaryCasReader.PARAM_SOURCE_LOCATION,
                 casPredictOutput.getAbsoluteFile(), BinaryCasReader.PARAM_PATTERNS, "*.bin");
 
         AnalysisEngineDescription tcAnnotation = AnalysisEngineFactory
@@ -88,7 +88,8 @@ public class PredictionWithModel
         AnalysisEngineDescription resultWriter = AnalysisEngineFactory.createEngineDescription(
                 ResultWriterAnnotator.class, ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_NAME,
                 annotationName, ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_FIELD_NAME,
-                annotationFieldName, ResultWriterAnnotator.PARAM_OUTPUT_FOLDER, predictionOutput);
+                annotationFieldName, ResultWriterAnnotator.PARAM_OUTPUT_FOLDER, predictionOutput,
+                ResultWriterAnnotator.PARAM_DEBUG_SYS_OUT, true);
 
         SimplePipeline.runPipeline(reader, tcAnnotation, annotator, resultWriter);
     }

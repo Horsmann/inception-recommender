@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -41,7 +42,7 @@ import de.unidue.ltl.recommender.core.predict.PredictionWithModel;
 
 public class RoundTripTest
 {
-    String jcasBase64;
+    String[] jcasBase64;
     String typesystemBase64;
     String annotationName;
     String annotationFieldName;
@@ -50,12 +51,13 @@ public class RoundTripTest
     public TemporaryFolder resultFolder = new TemporaryFolder();
     @Rule
     public TemporaryFolder modelLocation = new TemporaryFolder();
-    
+
     @Before
     public void setup() throws Exception
     {
         modelLocation.create();
         resultFolder.create();
+        
     }
 
     @After
@@ -69,7 +71,7 @@ public class RoundTripTest
     public void roundTrip() throws Exception
     {
         train();
-        
+
         predict();
     }
 
@@ -77,18 +79,20 @@ public class RoundTripTest
     {
         initPredict();
         PredictionWithModel pwm = new PredictionWithModel(resultFolder.getRoot());
-        pwm.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName, modelLocation.getRoot());
-        
+        pwm.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName,
+                modelLocation.getRoot());
+
         List<File> files = getFiles(resultFolder.getRoot());
         assertEquals(1, files.size());
-        
+
         String content = FileUtils.readFileToString(files.get(0), "utf-8");
-        assertTrue(content.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:xmi=\"http://www.omg.org/XMI\""));
+        assertTrue(content.startsWith(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:xmi=\"http://www.omg.org/XMI\""));
     }
 
     private List<File> getFiles(File resultFolder)
     {
-        File [] f = resultFolder.listFiles(new FileFilter()
+        File[] f = resultFolder.listFiles(new FileFilter()
         {
             @Override
             public boolean accept(File pathname)
@@ -96,30 +100,37 @@ public class RoundTripTest
                 return pathname.getName().endsWith(".txt");
             }
         });
-        
+
         return new ArrayList<>(Arrays.asList(f));
     }
 
     private void initPredict() throws IOException
     {
         String json = FileUtils
-                .readFileToString(new File("src/test/resources/jsonPredictionRequest.txt"), "utf-8");
-        
+                .readFileToString(new File("src/test/resources/jsonPredictRequestV2small.txt"), "utf-8");
 
         JsonElement parse = new JsonParser().parse(json);
-        jcasBase64 = new String(parse.getAsJsonObject().get("cas").toString().getBytes());
-        jcasBase64 = jcasBase64.substring(1, jcasBase64.length() - 1);
 
-        typesystemBase64 = new String(
-                parse.getAsJsonObject().get("typesystem").toString().getBytes());
+        JsonElement documents = parse.getAsJsonObject().get("documents");
+        JsonArray asJsonArray = documents.getAsJsonArray();
+
+        List<String> casBase64 = new ArrayList<>();
+
+        for (int i = 0; i < asJsonArray.size(); i++) {
+            String aCas = asJsonArray.get(i).toString();
+            casBase64.add(aCas.substring(1, aCas.length() - 1));
+        }
+
+        jcasBase64 = casBase64.toArray(new String[0]);
+
+        typesystemBase64 = parse.getAsJsonObject().get("typeSystem").toString();
         typesystemBase64 = typesystemBase64.substring(1, typesystemBase64.length() - 1);
 
-        annotationName = new String(parse.getAsJsonObject().get("layer").toString().getBytes());
+        annotationName = parse.getAsJsonObject().get("layer").toString();
         annotationName = annotationName.substring(1, annotationName.length() - 1);
 
-        annotationFieldName = new String(
-                parse.getAsJsonObject().get("target").toString().getBytes());
-        annotationFieldName = annotationFieldName.substring(1, annotationFieldName.length() - 1);        
+        annotationFieldName = parse.getAsJsonObject().get("feature").toString();
+        annotationFieldName = annotationFieldName.substring(1, annotationFieldName.length() - 1);
     }
 
     private void train() throws Exception
@@ -127,31 +138,39 @@ public class RoundTripTest
         initTrain();
         // Train Model
         TrainNewModel m = new TrainNewModel();
-        m.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName, modelLocation.getRoot());
+        m.run(jcasBase64, typesystemBase64, annotationName, annotationFieldName,
+                modelLocation.getRoot());
         assertTrue(modelLocation.getRoot().exists());
         File theModel = new File(modelLocation.getRoot(), "classifier.ser");
-        assertTrue(theModel.exists());        
+        assertTrue(theModel.exists());
     }
 
     private void initTrain() throws IOException
     {
         String json = FileUtils
-                .readFileToString(new File("src/test/resources/jsonTrainRequest.txt"), "utf-8");
-        
+                .readFileToString(new File("src/test/resources/jsonTrainRequestV2small.txt"), "utf-8");
 
         JsonElement parse = new JsonParser().parse(json);
-        jcasBase64 = new String(parse.getAsJsonObject().get("cas").toString().getBytes());
-        jcasBase64 = jcasBase64.substring(1, jcasBase64.length() - 1);
 
-        typesystemBase64 = new String(
-                parse.getAsJsonObject().get("typesystem").toString().getBytes());
+        JsonElement documents = parse.getAsJsonObject().get("documents");
+        JsonArray asJsonArray = documents.getAsJsonArray();
+
+        List<String> casBase64 = new ArrayList<>();
+
+        for (int i = 0; i < asJsonArray.size(); i++) {
+            String aCas = asJsonArray.get(i).toString();
+            casBase64.add(aCas.substring(1, aCas.length() - 1));
+        }
+
+        jcasBase64 = casBase64.toArray(new String[0]);
+
+        typesystemBase64 = parse.getAsJsonObject().get("typeSystem").toString();
         typesystemBase64 = typesystemBase64.substring(1, typesystemBase64.length() - 1);
 
-        annotationName = new String(parse.getAsJsonObject().get("layer").toString().getBytes());
+        annotationName = parse.getAsJsonObject().get("layer").toString();
         annotationName = annotationName.substring(1, annotationName.length() - 1);
 
-        annotationFieldName = new String(
-                parse.getAsJsonObject().get("target").toString().getBytes());
-        annotationFieldName = annotationFieldName.substring(1, annotationFieldName.length() - 1);        
+        annotationFieldName = parse.getAsJsonObject().get("feature").toString();
+        annotationFieldName = annotationFieldName.substring(1, annotationFieldName.length() - 1);
     }
 }

@@ -20,7 +20,6 @@ package de.unidue.ltl.recommender.core.predict;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.uima.UimaContext;
@@ -39,6 +38,8 @@ import org.dkpro.tc.api.type.TextClassificationOutcome;
 
 import de.tudarmstadt.ukp.dkpro.core.api.featurepath.FeaturePathUtils;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
+import de.unidue.ltl.recommender.core.train.TrainingOutcomeAnnotator;
 import de.unidue.ltl.recommender.core.util.CoreUtil;
 
 public class ResultWriterAnnotator
@@ -78,6 +79,12 @@ public class ResultWriterAnnotator
                     TextClassificationOutcome.class, s);
 
             for (int j = 0; j < outcomes.size(); j++) {
+                
+                if(outcomes.get(j).getOutcome().equals(TrainingOutcomeAnnotator.OTHER_OUTCOME)) {
+                    //is class "no class"
+                    continue;
+                }
+                
                 Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
                 AnnotationFS targetAnno = aJCas.getCas().createAnnotation(annotationType,
                         outcomes.get(j).getBegin(), outcomes.get(j).getEnd());
@@ -108,14 +115,38 @@ public class ResultWriterAnnotator
         }
 
         Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
-
-        Collection<AnnotationFS> select = CasUtil.select(aJCas.getCas(), annotationType);
-        for (AnnotationFS s : select) {
-            Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
-                    .getFeatureByBaseName(annoValue);
-            System.out.println(
-                    s.getCoveredText() + " " + s.getFeatureValueAsString(featureByBaseName));
+        
+        List<Token> tokens = new ArrayList<Token>(JCasUtil.select(aJCas, Token.class));
+        List<AnnotationFS> select = new ArrayList<AnnotationFS>(CasUtil.select(aJCas.getCas(), annotationType));
+        
+        for(int i=0; i < tokens.size(); i++) {
+            Token t = tokens.get(i);
+            
+            AnnotationFS a = null;
+            for(AnnotationFS afs : select) {
+                if (tokens.get(i).getBegin() == afs.getBegin()) {
+                    a = afs;
+                    break;
+                }
+            }
+            String predictionEntry="";
+            if(a!=null) {
+                Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
+                .getFeatureByBaseName(annoValue);
+                predictionEntry = " " + a.getFeatureValueAsString(featureByBaseName);
+            }else {
+                predictionEntry="--";
+            }
+            
+            System.out.println(String.format("%5d %5d %20s %15s", t.getBegin(), t.getEnd(), t.getCoveredText(), predictionEntry));
         }
+        
+//        for (AnnotationFS s : select) {
+//            Feature featureByBaseName = FeaturePathUtils.getType(aJCas.getTypeSystem(), annotation)
+//                    .getFeatureByBaseName(annoValue);
+//            System.out.println(
+//                    s.getCoveredText() + " " + s.getFeatureValueAsString(featureByBaseName));
+//        }
     }
 
     private void serializeCas(JCas aJCas, int c) throws Exception

@@ -36,16 +36,17 @@ public abstract class DKProTcSkeleton
     protected File typeSystemXML;
     protected File binCasInputFolder;
     protected File dkproHomeFallback;
-    
-    public abstract void run(String casBase64, String typeSystemBase64, String annotationName,
-            String annotationFieldName, File targetFolder) throws Exception;
+
+    public abstract void run(String [] casBase64, String typeSystemBase64, String annotationName,
+            String annotationFieldName, File targetFolder)
+        throws Exception;
 
     public DKProTcSkeleton() throws Exception
     {
         typeSystemXML = FileUtil.createTempFile("typeSystemTmp", ".txt");
         binCasInputFolder = Files.createTempDir();
     }
-    
+
     protected void dkproHome()
     {
         String property = System.getProperty("DKPRO_HOME");
@@ -55,15 +56,17 @@ public abstract class DKProTcSkeleton
         }
     }
 
-    protected TypeSystemDescription prepare(String casBase64, String typeSystemBase64)
+    protected TypeSystemDescription prepare(String[] casBase64, String typeSystemBase64)
         throws Exception
     {
         writeTypeSystemToFile(decodeBase64(typeSystemBase64));
-        JCas jCas = CoreUtil.deserialize(decodeBase64(casBase64), typeSystemXML);
+        TypeSystemDescription typeSystemDesc = null;
+        for (String cas : casBase64) {
+            JCas jCas = CoreUtil.deserialize(decodeBase64(cas), typeSystemXML);
 
-        TypeSystemDescription typeSystemDesc = TypeSystemUtil
-                .typeSystem2TypeSystemDescription(jCas.getTypeSystem());
-        CoreUtil.writeCasBinary(jCas, typeSystemDesc, binCasInputFolder);
+            typeSystemDesc = TypeSystemUtil.typeSystem2TypeSystemDescription(jCas.getTypeSystem());
+            CoreUtil.writeCasBinary(jCas, typeSystemDesc, binCasInputFolder);
+        }
 
         return typeSystemDesc;
     }
