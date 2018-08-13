@@ -69,16 +69,21 @@ public class TrainingOutcomeAnnotator
         
         //Annotate the targets
         for (AnnotationFS a : classificationTargets) {
+            
+            List<Token> tokensCovered = JCasUtil.selectCovered(aJCas, Token.class, a);
+            
+            //if two or more tokens are covered each is annotated separately
+            for (Token t : tokensCovered) {
+                TextClassificationTarget aTarget = new TextClassificationTarget(aJCas, t.getBegin(),
+                        t.getEnd());
+                aTarget.setId(tcId++);
+                aTarget.addToIndexes();
 
-            TextClassificationTarget aTarget = new TextClassificationTarget(aJCas, a.getBegin(),
-                    a.getEnd());
-            aTarget.setId(tcId++);
-            aTarget.addToIndexes();
-
-            TextClassificationOutcome outcome = new TextClassificationOutcome(aJCas, a.getBegin(),
-                    a.getEnd());
-            outcome.setOutcome(a.getFeatureValueAsString(feature));
-            outcome.addToIndexes();
+                TextClassificationOutcome outcome = new TextClassificationOutcome(aJCas,
+                        t.getBegin(), t.getEnd());
+                outcome.setOutcome(a.getFeatureValueAsString(feature));
+                outcome.addToIndexes();
+            }
         }
         
         //All sentences are fixed annotated as the objective sequence

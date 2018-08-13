@@ -75,7 +75,6 @@ public class PrintDeSerializedCasToConsole
             
             Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annontationType);
             
-            List<Token> tokens = new ArrayList<Token>(JCasUtil.select(aJCas, Token.class));
             List<AnnotationFS> select = new ArrayList<AnnotationFS>(CasUtil.select(aJCas.getCas(), annotationType));
             
             for(Sentence s : JCasUtil.select(aJCas, Sentence.class)) {
@@ -85,7 +84,13 @@ public class PrintDeSerializedCasToConsole
                     Token t = sentToks.get(j);
                     AnnotationFS a = null;
                     for(AnnotationFS afs : select) {
-                        if (tokens.get(j).getBegin() == afs.getBegin()) {
+                        if (sentToks.get(j).getBegin() == afs.getBegin()) {
+                            a = afs;
+                            break;
+                        } else if(sentToks.get(j).getBegin() > afs.getBegin() && sentToks.get(j).getEnd() < afs.getEnd()) {
+                            a = afs;
+                            break;
+                        }else if(sentToks.get(j).getEnd() == afs.getEnd()) {
                             a = afs;
                             break;
                         }

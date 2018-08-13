@@ -52,6 +52,10 @@ public class ResultWriterAnnotator
     public static final String PARAM_ANNOTATION_TARGET_FIELD_NAME = "annotationFieldName";
     @ConfigurationParameter(name = PARAM_ANNOTATION_TARGET_FIELD_NAME, mandatory = true)
     private String annoValue;
+    
+    public static final String PARAM_MERGE_ADJACENT_ANNOTATIONS = "mergeAdjecent";
+    @ConfigurationParameter(name = PARAM_MERGE_ADJACENT_ANNOTATIONS, mandatory = true, defaultValue="true")
+    private boolean mergeAdjacent;
 
     public static final String PARAM_OUTPUT_FOLDER = "outputFolder";
     @ConfigurationParameter(name = PARAM_OUTPUT_FOLDER, mandatory = true)
@@ -85,9 +89,19 @@ public class ResultWriterAnnotator
                     continue;
                 }
                 
+                int begin = outcomes.get(j).getBegin();
+                int end = outcomes.get(j).getEnd();
+                
+                int adjacentLen=0;
+                if(mergeAdjacent) {
+                //Look-ahead to merge adjacent annotations of same feature value
+                    adjacentLen=collectNumberOfMergeCandidates(outcomes, j);
+                 end = outcomes.get(j+adjacentLen).getEnd();
+                }
+                
                 Type annotationType = CasUtil.getAnnotationType(aJCas.getCas(), annotation);
                 AnnotationFS targetAnno = aJCas.getCas().createAnnotation(annotationType,
-                        outcomes.get(j).getBegin(), outcomes.get(j).getEnd());
+                        begin, end);
                 Feature featureByBaseName = FeaturePathUtils
                         .getType(aJCas.getTypeSystem(), annotation).getFeatureByBaseName(annoValue);
                 targetAnno.setFeatureValueFromString(featureByBaseName,
@@ -95,6 +109,8 @@ public class ResultWriterAnnotator
                 ((Annotation) targetAnno).addToIndexes();
 
                 outcomes.get(j).removeFromIndexes();
+                
+                j+=adjacentLen;
             }
         }
 
@@ -106,6 +122,22 @@ public class ResultWriterAnnotator
         catch (Exception e) {
             throw new AnalysisEngineProcessException(e);
         }
+    }
+
+    private int collectNumberOfMergeCandidates(List<TextClassificationOutcome> outcomes, final int currIdx)
+    {
+        int k = currIdx+1;
+        
+        while(k < outcomes.size()) {
+            if(outcomes.get(k-1).getOutcome().equals(outcomes.get(k).getOutcome())) {
+                k++;
+            }
+            else {
+                break;
+            }
+        }
+        
+        return k-currIdx-1;
     }
 
     private void debugSysOut(JCas aJCas)
@@ -125,6 +157,12 @@ public class ResultWriterAnnotator
             AnnotationFS a = null;
             for(AnnotationFS afs : select) {
                 if (tokens.get(i).getBegin() == afs.getBegin()) {
+                    a = afs;
+                    break;
+                } else if(tokens.get(i).getBegin() > afs.getBegin() && tokens.get(i).getEnd() < afs.getEnd()) {
+                    a = afs;
+                    break;
+                }else if(tokens.get(i).getEnd() == afs.getEnd()) {
                     a = afs;
                     break;
                 }

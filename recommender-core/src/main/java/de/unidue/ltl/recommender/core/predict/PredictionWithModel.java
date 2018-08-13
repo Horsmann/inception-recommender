@@ -89,7 +89,8 @@ public class PredictionWithModel
                 ResultWriterAnnotator.class, ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_NAME,
                 annotationName, ResultWriterAnnotator.PARAM_ANNOTATION_TARGET_FIELD_NAME,
                 annotationFieldName, ResultWriterAnnotator.PARAM_OUTPUT_FOLDER, predictionOutput,
-                ResultWriterAnnotator.PARAM_DEBUG_SYS_OUT, true);
+                ResultWriterAnnotator.PARAM_DEBUG_SYS_OUT, true,
+                ResultWriterAnnotator.PARAM_MERGE_ADJACENT_ANNOTATIONS, true);
 
         SimplePipeline.runPipeline(reader, tcAnnotation, annotator, resultWriter);
     }
