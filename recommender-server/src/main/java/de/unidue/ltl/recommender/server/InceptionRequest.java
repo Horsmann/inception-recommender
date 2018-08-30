@@ -21,27 +21,27 @@ package de.unidue.ltl.recommender.server;
 public class InceptionRequest
 {
 
-    public String getCAS()
+    public String [] getDocuments()
     {
-        return cas;
+        return documents;
     }
 
 
-    public void setCAS(String CAS)
+    public void setDocuments(String [] documents)
     {
-        this.cas = CAS;
+        this.documents = documents;
     }
 
 
-    public String getTypesystem()
+    public String getTypeSystem()
     {
-        return typesystem;
+        return typeSystem;
     }
 
 
-    public void setTypesystem(String Typesystem)
+    public void setTypeSystem(String typeSystem)
     {
-        this.typesystem = Typesystem;
+        this.typeSystem = typeSystem;
     }
 
 
@@ -57,21 +57,21 @@ public class InceptionRequest
     }
 
 
-    public String getTarget()
+    public String getFeature()
     {
-        return target;
+        return feature;
     }
 
 
-    public void setTarget(String Target)
+    public void setFeature(String feature)
     {
-        this.target = Target;
+        this.feature = feature;
     }
 
-    String cas;
-    String typesystem;
+    String [] documents;
+    String typeSystem;
     String layer;
-    String target;
+    String feature;
 
     public InceptionRequest() {};
   

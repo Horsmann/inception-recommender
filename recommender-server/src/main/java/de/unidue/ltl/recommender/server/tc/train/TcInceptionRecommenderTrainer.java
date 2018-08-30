@@ -40,23 +40,23 @@ public class TcInceptionRecommenderTrainer
     @Override
     public InceptionRecommenderModel train(InceptionRequest req) throws Exception
     {
-        String cas = req.getCAS();
-        String typesystem = req.getTypesystem();
-        String id = req.getLayer();
-        String target = req.getTarget();
+        String [] documents = req.getDocuments();
+        String typeSystem = req.getTypeSystem();
+        String layer = req.getLayer();
+        String feature = req.getFeature();
 
         long timestamps = System.currentTimeMillis();
-        File modelLocation = new File(FileUtils.getTempDirectory(), id);
+        File modelLocation = new File(FileUtils.getTempDirectory(), layer);
 
         logger.info("Will store model temporary at [" + modelLocation.getAbsolutePath() + "]");
 
         TrainNewModel model = new TrainNewModel();
-        model.run(cas, typesystem, id, target, modelLocation);
+        model.run(documents, typeSystem, layer, feature, modelLocation);
 
-        logger.info("Will create model with id [" + id + "] at location ["
+        logger.info("Will create model with id [" + layer + "] at location ["
                 + modelLocation.getAbsolutePath() + "]");
 
-        return new TcModel(id, timestamps, modelLocation);
+        return new TcModel(layer, timestamps, modelLocation);
     }
 
 }
