@@ -32,36 +32,33 @@ import org.dkpro.tc.api.type.TextClassificationTarget;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 
-public class TargetSetterAnnotator
-    extends JCasAnnotator_ImplBase
-{
+public class TargetSetterAnnotator extends JCasAnnotator_ImplBase {
 
-    int tcId = 0;
+	int tcId = 0;
 
-    @Override
-    public void process(JCas aJCas) throws AnalysisEngineProcessException
-    {
+	/**
+	 * Prepares the JCas for a prediction. Iterates the tokens and sets the
+	 * annotations required by DKPro TC to work.
+	 */
+	@Override
+	public void process(JCas aJCas) throws AnalysisEngineProcessException {
 
-        List<Sentence> sents = new ArrayList<Sentence>(JCasUtil.select(aJCas, Sentence.class));
-        for (Sentence s : sents) {
+		List<Sentence> sents = new ArrayList<Sentence>(JCasUtil.select(aJCas, Sentence.class));
+		for (Sentence s : sents) {
 
-            TextClassificationSequence seq = new TextClassificationSequence(aJCas, s.getBegin(),
-                    s.getEnd());
-            seq.addToIndexes();
+			TextClassificationSequence seq = new TextClassificationSequence(aJCas, s.getBegin(), s.getEnd());
+			seq.addToIndexes();
 
-            List<Token> tokens = new ArrayList<Token>(
-                    JCasUtil.selectCovered(aJCas, Token.class, s));
-            for (Token t : tokens) {
-                TextClassificationTarget aTarget = new TextClassificationTarget(aJCas, t.getBegin(),
-                        t.getEnd());
-                aTarget.setId(tcId++);
-                aTarget.addToIndexes();
+			List<Token> tokens = new ArrayList<Token>(JCasUtil.selectCovered(aJCas, Token.class, s));
+			for (Token t : tokens) {
+				TextClassificationTarget aTarget = new TextClassificationTarget(aJCas, t.getBegin(), t.getEnd());
+				aTarget.setId(tcId++);
+				aTarget.addToIndexes();
 
-                TextClassificationOutcome outcome = new TextClassificationOutcome(aJCas,
-                        t.getBegin(), t.getEnd());
-                outcome.setOutcome("UNKNOWN-LABEL");
-                outcome.addToIndexes();
-            }
-        }
-    }
+				TextClassificationOutcome outcome = new TextClassificationOutcome(aJCas, t.getBegin(), t.getEnd());
+				outcome.setOutcome("UNKNOWN-LABEL");
+				outcome.addToIndexes();
+			}
+		}
+	}
 }

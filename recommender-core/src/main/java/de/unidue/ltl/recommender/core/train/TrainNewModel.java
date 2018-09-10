@@ -66,10 +66,13 @@ public class TrainNewModel
         throws Exception
     {
 
-        CollectionReaderDescription trainReader = createReaderDescription(BinaryCasReader.class,
-                typeSystem, BinaryCasReader.PARAM_LANGUAGE, "x-undefined",
-                BinaryCasReader.PARAM_SOURCE_LOCATION, casPredictOutput.getAbsolutePath(),
-                BinaryCasReader.PARAM_PATTERNS, "*.bin");
+        CollectionReaderDescription trainReader = createReaderDescription(
+        												BinaryCasReader.class,
+        												typeSystem,
+        												BinaryCasReader.PARAM_LANGUAGE, "x-undefined",
+        												BinaryCasReader.PARAM_SOURCE_LOCATION, casPredictOutput.getAbsolutePath(),
+        												BinaryCasReader.PARAM_PATTERNS, "*.bin"
+        											);
 
         ExperimentBuilder builder = new ExperimentBuilder();
         builder.experiment(ExperimentType.SAVE_MODEL, "InceptionTrain")
@@ -91,7 +94,7 @@ public class TrainNewModel
                           ,create(TargetSurfaceFormContextFeature.class,
                                   TargetSurfaceFormContextFeature.PARAM_RELATIVE_TARGET_ANNOTATION_INDEX, 0)
                           ,create(CharacterNGram.class, 
-                                  CharacterNGram.PARAM_NGRAM_USE_TOP_K, 500,
+                                  CharacterNGram.PARAM_NGRAM_USE_TOP_K, 2500,
                                   CharacterNGram.PARAM_NGRAM_MIN_N, 1,
                                   CharacterNGram.PARAM_NGRAM_MAX_N, 4)
                         )
