@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations="classpath:test.properties")
 public class RequestControllerTest
 {
 
@@ -60,7 +62,7 @@ public class RequestControllerTest
         controllerToTest = mock(RequestController.class);
 
         String trainRequest = FileUtils.readFileToString(new File(
-                "src/test/resources/jsonTrainRequest.txt"),
+                "src/test/resources/jsonTrainRequestV2small.txt"),
                 "utf-8");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/train")
@@ -87,7 +89,7 @@ public class RequestControllerTest
                 .andReturn();
         
         String contentAsString = result.getResponse().getContentAsString();
-        assertTrue(contentAsString.startsWith("<?xml version"));
+        assertTrue(contentAsString.startsWith("[ \"<?xml version"));
     }
 
 }

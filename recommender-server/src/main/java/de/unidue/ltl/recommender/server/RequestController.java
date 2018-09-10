@@ -72,16 +72,16 @@ public class RequestController
     @RequestMapping(value = "/predict", method = RequestMethod.POST)
     public ResponseEntity<String> executePrediction(@RequestBody InceptionRequest inceptionReq)
     {
-        String xmlCAS = "-init-";
+        String xmlCasArrayAsString = "-init-";
 
         try {
-            xmlCAS = prediction(inceptionReq);
+            xmlCasArrayAsString = prediction(inceptionReq);
         }
         catch (Exception e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(xmlCAS, HttpStatus.OK);
+        return new ResponseEntity<>(xmlCasArrayAsString, HttpStatus.OK);
     }
 
     private String prediction(InceptionRequest inceptionReq) throws Exception
